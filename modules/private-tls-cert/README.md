@@ -56,7 +56,7 @@ Now that you have your TLS certs, check out the next section for how to use them
 
 Distribute the private and public keys (the files at `private_key_file_path` and `public_key_file_path`) to the 
 servers that will use them to handle TLS connections (e.g. Vault). For example, to run Vault with the [run-vault 
-module](https://github.com/gruntwork-io/terraform-consul-azure/modules/run-vault), you need to pass it the TLS certs: 
+module](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/run-vault), you need to pass it the TLS certs: 
 
 ```
 /opt/vault/bin/run-vault --tls-cert-file /opt/vault/tls/vault.crt.pem --tls-key-file /opt/vault/tls/vault.key.pem
@@ -94,7 +94,7 @@ value               bar
 ```
 
 As an alternative, you can configure the certificate trust on your server so that all TLS clients trust your CA
-public key by running the [update-certificate-store module](https://github.com/gruntwork-io/terraform-consul-azure/modules/update-certificate-store) on your server. Once 
+public key by running the [update-certificate-store module](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/update-certificate-store) on your server. Once 
 you do that, your system will trust the public key without having to pass it in explicitly:
 
 ```
@@ -192,8 +192,7 @@ So here's our strategy for issuing a TLS Cert for a private service:
   - This means anyone who trusts the CA will trust that the possessor of the private key that corresponds to this public 
     key is who they claim to be.
   - We will be extremely careful with the TLS private key since anyone who obtains it can impersonate our private 
-    service! For this reason, we recommend immediately encrypting the private key with 
-    [KMS](https://aws.amazon.com/kms/).
+    service!
 
 1. **Freely advertise our CA's public key to all internal services.**
   - Any service that wishes to connect securely to our private service will need our CA's public key so it can declare 

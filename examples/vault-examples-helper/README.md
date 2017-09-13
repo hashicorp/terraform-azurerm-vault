@@ -1,9 +1,8 @@
 # Vault Examples Helper
 
 This folder contains a helper script called `vault-examples-helper.sh` for working with the 
-[vault-cluster-private](https://github.com/gruntwork-io/terraform-consul-azure/examples/vault-cluster-private) and [vault-clsuter-public](https://github.com/gruntwork-io/terraform-consul-azure/examples/vault-cluster-public) 
-examples. After running `terraform apply` on one of the examples, if you run  `vault-examples-helper.sh`, it will 
-automatically:
+[main example](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/MAIN.md) After running `terraform apply`, if you 
+run  `vault-examples-helper.sh`, it will automatically:
 
 1. Wait for the Vault server cluster to come up.
 1. Print out the IP address of the Vault load balancer.

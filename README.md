@@ -10,21 +10,21 @@ server cluster as a [high availability backend](https://www.vaultproject.io/docs
 
 This Module includes:
 
-* [install-vault](https://github.com/gruntwork-io/terraform-consul-azure/modules/install-valut): This module can be used to install Vault. It can be used in a 
+* [install-vault](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/install-valut): This module can be used to install Vault. It can be used in a 
   [Packer](https://www.packer.io/) template to create a Vault 
   [Azure Manager Image](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/build-image-with-packer).
 
-* [run-vault](https://github.com/gruntwork-io/terraform-consul-azure/modules/run-vault): This module can be used to configure and run Vault. It can be used in a 
+* [run-vault](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/run-vault): This module can be used to configure and run Vault. It can be used in a 
   [Custom Data](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/classic/inject-custom-data) 
   script to fire up Vault while the server is booting.
 
-* [vault-cluster](https://github.com/gruntwork-io/terraform-consul-azure/modules/vault-cluster): Terraform code to deploy a cluster of Vault servers using an [Scale Set]
+* [vault-cluster](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/vault-cluster): Terraform code to deploy a cluster of Vault servers using an [Scale Set]
 (https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-create).
    
-* [private-tls-cert](https://github.com/gruntwork-io/terraform-consul-azure/modules/private-tls-cert): Generate a private TLS certificate for use with a private Vault 
+* [private-tls-cert](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/private-tls-cert): Generate a private TLS certificate for use with a private Vault 
   cluster.
    
-* [update-certificate-store](https://github.com/gruntwork-io/terraform-consul-azure/modules/update-certificate-store): Add a trusted, CA public key to an OS's 
+* [update-certificate-store](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/update-certificate-store): Add a trusted, CA public key to an OS's 
   certificate store. This allows you to establish TLS connections to services that use this TLS certs signed by this
   CA without getting x509 certificate errors.
    
@@ -76,30 +76,26 @@ To deploy the Consul server cluster, use the [Consul AWS Module](https://github.
 
 To deploy the Vault cluster:
 
-1. Create an Azure Image that has Vault installed (using the [install-vault module](https://github.com/gruntwork-io/terraform-consul-azure/modules/install-vault)) and the Consul
+1. Create an Azure Image that has Vault installed (using the [install-vault module](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/install-vault)) and the Consul
    agent installed (using the [install-consul 
    module](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-consul)). Here is an 
-   [example Packer template](https://github.com/gruntwork-io/terraform-consul-azure/examples/vault-consul-image). 
+   [example Packer template](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/examples/vault-consul-image). 
    
 1. Deploy that Azure Image across a Scale Set in a private subnet using the Terraform [vault-cluster 
-   module](https://github.com/gruntwork-io/terraform-consul-azure/modules/vault-cluster). 
+   module](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/vault-cluster). 
 
 1. Execute the [run-consul script](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/run-consul)
    with the `--client` flag during boot on each Instance to have the Consul agent connect to the Consul server cluster. 
 
-1. Execute the [run-vault](https://github.com/gruntwork-io/terraform-consul-azure/modules/run-vault) script during boot on each Instance to create the Vault cluster. 
+1. Execute the [run-vault](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/run-vault) script during boot on each Instance to create the Vault cluster. 
 
 1. If you only need to access Vault from inside your Azure account (recommended), run the [install-dnsmasq 
    module](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-dnsmasq) on each server, and 
    that server will be able to reach Vault using the Consul Server cluster as the DNS resolver (e.g. using an address 
-   like `vault.service.consul`). See the [vault-cluster-private example](https://github.com/gruntwork-io/terraform-consul-azure/examples/vault-cluster-private) for working 
+   like `vault.service.consul`). See the [main example](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/MAIN.md) for working 
    sample code.
 
-1. If you need to access Vault from the public Internet, deploy the [vault-elb module](https://github.com/gruntwork-io/terraform-consul-azure/modules/vault-elb) in a public 
-   subnet and have all requests to Vault go through the ELB. See the [vault-cluster-public 
-   example](https://github.com/gruntwork-io/terraform-consul-azure/examples/vault-cluster-public) for working sample code.
-
-1. Head over to the [How do you use the Vault cluster?](https://github.com/gruntwork-io/terraform-consul-azure/modules/vault-cluster#how-do-you-use-the-vault-cluster) guide
+1. Head over to the [How do you use the Vault cluster?](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/vault-cluster#how-do-you-use-the-vault-cluster) guide
    to learn how to initialize, unseal, and use Vault.
 
  
