@@ -9,7 +9,7 @@ readonly SUPERVISOR_CONFIG_PATH="/etc/supervisor/conf.d/run-vault.conf"
 readonly DEFAULT_PORT=8200
 readonly DEFAULT_LOG_LEVEL="info"
 
-readonly EC2_INSTANCE_METADATA_URL="http://169.254.169.254/latest/meta-data"
+readonly AZURE_INSTANCE_METADATA_URL="http://169.254.169.254/metadata/instance?api-version=2017-07-01"
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SCRIPT_NAME="$(basename "$0")"
@@ -22,8 +22,9 @@ function print_usage {
   echo
   echo "Options:"
   echo
-  echo -e "  --s3-bucket\tSpecifies the S3 bucket where Vault data should be stored. Required."
-  echo -e "  --s3-bucket-region\tSpecifies the AWS region where --s3-bucket lives. Required."
+  echo -e "  --azure-account-name\tSpecifies the Azure Storage account name where Vault data should be stored. Required."
+  echo -e "  --azure-account-key\tSpecifies the Azure Storage account key for --azure-account-name. Required."
+  echo -e "  --azure-container\tSpecifies the Azure Storage Blob container name. Required."
   echo -e "  --tls-cert-file\tSpecifies the path to the certificate for TLS. Required. To use a CA certificate, concatenate the primary certificate and the CA certificate together."
   echo -e "  --tls-key-file\tSpecifies the path to the private key for the certificate. Required."
   echo -e "  --port\t\tThe port for Vault to listen on. Optional. Default is $DEFAULT_PORT."
@@ -37,7 +38,7 @@ function print_usage {
   echo
   echo "Example:"
   echo
-  echo "  run-vault --s3-bucket my-vault-bucket --s3-bucket-region us-east-1 --tls-cert-file /opt/vault/tls/vault.crt.pem --tls-key-file /opt/vault/tls/vault.key.pem"
+  echo "  run-vault --azure-account-name my-account-name --azure-account-key [REDACTED] --azure-container my-container-name --tls-cert-file /opt/vault/tls/vault.crt.pem --tls-key-file /opt/vault/tls/vault.key.pem"
 }
 
 function log {
@@ -62,6 +63,16 @@ function log_error {
   log "ERROR" "$message"
 }
 
+function lookup_path_in_instance_metadata {
+  local readonly path="$1"
+  curl --silent --show-error --header Metadata:true --location "$AZURE_INSTANCE_METADATA_URL" | jq -r "$path"
+}
+
+function get_instance_ip_address {
+  lookup_path_in_instance_metadata ".network.interface[0].ipv4.ipAddress[0].privateIpAddress"
+}
+
+
 # Based on code from: http://stackoverflow.com/a/16623897/483528
 function strip_prefix {
   local readonly str="$1"
@@ -80,15 +91,6 @@ function assert_not_empty {
   fi
 }
 
-function lookup_path_in_instance_metadata {
-  local readonly path="$1"
-  curl --silent --location "$EC2_INSTANCE_METADATA_URL/$path/"
-}
-
-function get_instance_ip_address {
-  lookup_path_in_instance_metadata "local-ipv4"
-}
-
 function assert_is_installed {
   local readonly name="$1"
 
@@ -105,8 +107,9 @@ function generate_vault_config {
   local readonly cluster_port="$4"
   local readonly config_dir="$5"
   local readonly user="$6"
-  local readonly s3_bucket="$7"
-  local readonly s3_bucket_region="$8"
+  local readonly azure_account_name="$7"
+  local readonly azure_account_key="$8"
+  local readonly azure_container="$9"
   local readonly config_path="$config_dir/$VAULT_CONFIG_FILE"
 
   local instance_ip_address
@@ -114,9 +117,10 @@ function generate_vault_config {
 
   log_info "Creating default Vault config file in $config_path"
   cat > "$config_path" <<EOF
-storage "s3" {
-  bucket = "$s3_bucket"
-  region = "$s3_bucket_region"
+storage "azure" {
+  accountName = "$azure_account_name"
+  accountKey  = "$azure_account_key"
+  container   = "$azure_container"
 }
 
 ha_storage "consul" {
@@ -179,8 +183,9 @@ function run {
   local tls_key_file=""
   local port="$DEFAULT_PORT"
   local cluster_port=""
-  local s3_bucket=""
-  local s3_bucket_region=""
+  local azure_account_name=""
+  local azure_account_key=""
+  local azure_container=""
   local config_dir=""
   local bin_dir=""
   local log_dir=""
@@ -201,12 +206,16 @@ function run {
         tls_key_file="$2"
         shift
         ;;
-      --s3-bucket)
-        s3_bucket="$2"
+      --azure-account-name)
+        azure_account_name="$2"
         shift
         ;;
-      --s3-bucket-region)
-        s3_bucket_region="$2"
+      --azure-account-key)
+        azure_account_key="$2"
+        shift
+        ;;
+      --azure-container)
+        azure_container="$2"
         shift
         ;;
       --port)
@@ -263,11 +272,12 @@ function run {
 
   assert_not_empty "--tls-cert-file" "$tls_cert_file"
   assert_not_empty "--tls-key-file" "$tls_key_file"
-  assert_not_empty "--s3-bucket" "$s3_bucket"
-  assert_not_empty "--s3-bucket-region" "$s3_bucket_region"
+  assert_not_empty "--azure-account-name" "$azure_account_name"
+  assert_not_empty "--azure-account-key" "$azure_account_key"
+  assert_not_empty "--azure-container" "$azure_container"
 
   assert_is_installed "supervisorctl"
-  assert_is_installed "aws"
+  assert_is_installed "az"
   assert_is_installed "curl"
   assert_is_installed "jq"
 
@@ -294,7 +304,7 @@ function run {
   if [[ "$skip_vault_config" == "true" ]]; then
     log_info "The --skip-vault-config flag is set, so will not generate a default Vault config file."
   else
-    generate_vault_config "$tls_cert_file" "$tls_key_file" "$port" "$cluster_port" "$config_dir" "$user" "$s3_bucket" "$s3_bucket_region"
+    generate_vault_config "$tls_cert_file" "$tls_key_file" "$port" "$cluster_port" "$config_dir" "$user" "$azure_account_name" "$azure_account_key" "$azure_container"
   fi
 
   generate_supervisor_config "$SUPERVISOR_CONFIG_PATH" "$config_dir" "$bin_dir" "$log_dir" "$log_level" "$user"
