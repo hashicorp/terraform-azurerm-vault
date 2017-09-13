@@ -3,7 +3,6 @@
 # operating systems:
 #
 # 1. Ubuntu 16.04
-# 2. Amazon Linux
 
 set -e
 
@@ -69,7 +68,7 @@ function assert_not_empty {
 }
 
 # Install steps are based on: http://unix.stackexchange.com/a/291098/215969
-function install_supervisord_debian {
+function install_supervisord {
   sudo apt-get install -y supervisor
   sudo update-rc.d supervisor defaults
 
@@ -77,55 +76,17 @@ function install_supervisord_debian {
   sudo systemctl enable supervisor
 }
 
-# Install steps are based on: http://stackoverflow.com/a/31576473/483528
-function install_supervisord_amazon_linux {
-  sudo pip install supervisor
-
-  # On Amazon Linux, /usr/local/bin is not in PATH for the root user, so we add symlinks to /usr/bin, which is in PATH
-  if [[ ! -f "/usr/bin/supervisorctl" ]]; then
-    sudo ln -s /usr/local/bin/supervisorctl /usr/bin/supervisorctl
-  fi
-  if [[ ! -f "/usr/bin/supervisord" ]]; then
-    sudo ln -s /usr/local/bin/supervisord /usr/bin/supervisord
-  fi
-
-  sudo cp "$SCRIPT_DIR/supervisor-initd-script.sh" "/etc/init.d/supervisor"
-  sudo chmod a+x /etc/init.d/supervisor
-  sudo mkdir -p /var/log/supervisor
-
-  create_supervisor_config
-  sudo chkconfig --add supervisor
-  sudo chkconfig supervisor on
-}
-
 function create_supervisor_config {
   sudo mkdir -p "$SUPERVISOR_CONF_DIR"
   sudo cp "$SCRIPT_DIR/supervisord.conf" "$SUPERVISOR_DIR/supervisord.conf"
 }
 
-function has_yum {
-  [[ -n "$(command -v yum)" ]]
-}
-
-function has_apt_get {
-  [[ -n "$(command -v apt-get)" ]]
-}
-
 function install_dependencies {
   log_info "Installing dependencies"
 
-  if $(has_apt_get); then
     sudo apt-get update -y
-    sudo apt-get install -y awscli curl unzip jq
-    install_supervisord_debian
-  elif $(has_yum); then
-    sudo yum update -y
-    sudo yum install -y aws curl unzip jq
-    install_supervisord_amazon_linux
-  else
-    log_error "Could not find apt-get or yum. Cannot install dependencies on this OS."
-    exit 1
-  fi
+    sudo apt-get install -y azure-cli curl unzip jq
+    install_supervisord
 }
 
 function user_exists {
