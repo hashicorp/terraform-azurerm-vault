@@ -1,18 +1,11 @@
 # Vault Install Script
 
 This folder contains a script for installing Vault and its dependencies. You can use this script, along with the
-[run-vault script](/modules/run-vault) it installs, to create a Vault [Amazon Machine Image 
-(AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) that can be deployed in 
-[AWS](https://aws.amazon.com/) across an Auto Scaling Group using the [vault-cluster module](/modules/vault-cluster).
+[run-vault script](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/run-vault) it installs, to create a Vault [Azure Managed Image 
+](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/build-image-with-packer) that can be deployed in 
+[Azure](https://azure.microsoft.com/) across an Scale Set using the [vault-cluster module](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/vault-cluster).
 
-This script has been tested on the following operating systems:
-
-* Ubuntu 16.04
-* Amazon Linux
-
-There is a good chance it will work on other flavors of Debian, CentOS, and RHEL as well.
-
-
+This script has been tested on Ubuntu 16.04. There is a good chance it will work on other flavors of Debian as well.
 
 ## Quick start
 
@@ -20,22 +13,18 @@ To install Vault, use `git` to clone this repository at a specific tag (see the 
 for all available tags) and run the `install-vault` script:
 
 ```
-git clone --branch <VERSION> https://github.com/gruntwork-io/vault-aws-blueprint.git
-vault-aws-blueprint/modules/install-vault/install-vault --version 0.5.4
+git clone --branch <VERSION> https://github.com/gruntwork-io/terraform-vault-azure.git
+terraform-vault-azure/tree/master/modules/install-vault/install-vault --version 0.5.4
 ```
 
-The `install-vault` script will install Vault, its dependencies, and the [run-vault script](/modules/run-vault).
+The `install-vault` script will install Vault, its dependencies, and the [run-vault script](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/run-vault).
 You can then run the `run-vault` script when the server is booting to start Vault.
 
 We recommend running the `install-vault` script as part of a [Packer](https://www.packer.io/) template to create a
-Vault [Amazon Machine Image (AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) (see the 
-[vault-consul-ami example](/examples/vault-consul-ami) for sample code). You can then deploy the AMI across an Auto 
-Scaling Group using the [vault-cluster module](/modules/vault-cluster) (see the 
-[vault-cluster-public](/examples/vault-cluster-public) and [vault-cluster-private](/examples/vault-cluster-private) 
-examples for fully-working sample code).
-
-
-
+Vault [Azure Managed Image](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/build-image-with-packer) (see the 
+[vault-consul-image example](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/examples/vault-consul-image) 
+for sample code). You can then deploy the Azure Image across a Scale Setthe [vault-cluster module](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/vault-cluster) 
+(see the [main example](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/MAIN.md) for fully-working sample code).
 
 ## Command line Arguments
 
@@ -83,7 +72,7 @@ Install the following:
 * `vault`: Download the Vault zip file from the [downloads page](https://www.vaultproject.io/downloads.html) (the 
   version number is configurable via the `--version` argument), and extract the `vault` binary into 
   `/opt/vault/bin`. Add a symlink to the `vault` binary in `/usr/local/bin`.
-* `run-vault`: Copy the [run-vault script](/modules/run-vault) into `/opt/vault/bin`. 
+* `run-vault`: Copy the [run-vault script](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/run-vault) into `/opt/vault/bin`. 
 
 
 ### Configure mlock
@@ -107,13 +96,3 @@ After the `install-vault` script finishes running, you may wish to do the follow
 1. If `/usr/local/bin` isn't already part of `PATH`, you should add it so you can run the `vault` command without
    specifying the full path.
    
-
-
-## Why use Git to install this code?
-
-<!-- TODO: update the package managers URL to the final URL when this Blueprint is released -->
-
-We needed an easy way to install these scripts that satisfied a number of requirements, including working on a variety 
-of operating systems and supported versioning. Our current solution is to use `git`, but this may change in the future.
-See [Package Managers](https://github.com/gruntwork-io/consul-aws-blueprint/blob/master/_docs/package-managers.md) for 
-a full discussion of the requirements, trade-offs, and why we picked `git`.

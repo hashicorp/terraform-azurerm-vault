@@ -1,72 +1,68 @@
-# Vault AWS Blueprint
+# Vault Azure Module
 
-This repo contains a Blueprint for how to deploy a [Vault](https://www.vaultproject.io/) cluster on 
-[AWS](https://aws.amazon.com/) using [Terraform](https://www.terraform.io/). Vault is an open source tool for managing
-secrets. This Blueprint uses [S3](https://aws.amazon.com/s3/) as a [storage 
+This repo contains a Module to deploy a [Vault](https://www.vaultproject.io/) cluster on 
+[Azure](https://azure.microsoft.com/) using [Terraform](https://www.terraform.io/). Vault is an open source tool for 
+managing secrets. This Module uses [Azure Storage](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-dotnet-how-to-use-blobs) as a [storage 
 backend](https://www.vaultproject.io/docs/configuration/storage/index.html) and a [Consul](https://www.consul.io) 
 server cluster as a [high availability backend](https://www.vaultproject.io/docs/concepts/ha.html):
 
 ![Vault architecture](/_docs/architecture.png)
 
-This Blueprint includes:
+This Module includes:
 
-* [install-vault](/modules/install-valut): This module can be used to install Vault. It can be used in a 
+* [install-vault](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/install-valut): This module can be used to install Vault. It can be used in a 
   [Packer](https://www.packer.io/) template to create a Vault 
-  [Amazon Machine Image (AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html).
+  [Azure Manager Image](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/build-image-with-packer).
 
-* [run-vault](/modules/run-vault): This module can be used to configure and run Vault. It can be used in a 
-  [User Data](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html#user-data-shell-scripts) 
+* [run-vault](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/run-vault): This module can be used to configure and run Vault. It can be used in a 
+  [Custom Data](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/classic/inject-custom-data) 
   script to fire up Vault while the server is booting.
 
-* [vault-cluster](/modules/vault-cluster): Terraform code to deploy a cluster of Vault servers using an [Auto Scaling 
-  Group](https://aws.amazon.com/autoscaling/).
-    
-* [vault-elb](/modules/vault-elb): Configures an [Elastic Load Balancer 
-  (ELB)](https://aws.amazon.com/elasticloadbalancing/classicloadbalancer/) in front of Vault if you need to access it
-  from the public Internet.
+* [vault-cluster](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/vault-cluster): Terraform code to deploy a cluster of Vault servers using an [Scale Set]
+(https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-create).
    
-* [private-tls-cert](/modules/private-tls-cert): Generate a private TLS certificate for use with a private Vault 
+* [private-tls-cert](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/private-tls-cert): Generate a private TLS certificate for use with a private Vault 
   cluster.
    
-* [update-certificate-store](/modules/update-certificate-store): Add a trusted, CA public key to an OS's 
+* [update-certificate-store](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/update-certificate-store): Add a trusted, CA public key to an OS's 
   certificate store. This allows you to establish TLS connections to services that use this TLS certs signed by this
   CA without getting x509 certificate errors.
    
 
 
 
-## What's a Blueprint?
+## What's a Module?
 
-A Blueprint is a canonical, reusable, best-practices definition for how to run a single piece of infrastructure, such 
-as a database or server cluster. Each Blueprint is created primarily using [Terraform](https://www.terraform.io/), 
+A Module is a canonical, reusable, best-practices definition for how to run a single piece of infrastructure, such 
+as a database or server cluster. Each Module is created primarily using [Terraform](https://www.terraform.io/), 
 includes automated tests, examples, and documentation, and is maintained both by the open source community and 
 companies that provide commercial support. 
 
 Instead of having to figure out the details of how to run a piece of infrastructure from scratch, you can reuse 
 existing code that has been proven in production. And instead of maintaining all that infrastructure code yourself, 
-you can leverage the work of the Blueprint community and maintainers, and pick up infrastructure improvements through
+you can leverage the work of the Module community and maintainers, and pick up infrastructure improvements through
 a version number bump.
  
  
  
-## Who maintains this Blueprint?
+## Who maintains this Module?
 
-This Blueprint is maintained by [Gruntwork](http://www.gruntwork.io/). If you're looking for help or commercial 
-support, send an email to [blueprints@gruntwork.io](mailto:blueprints@gruntwork.io?Subject=Vault%20Blueprint). 
+This Module is maintained by [Gruntwork](http://www.gruntwork.io/). If you're looking for help or commercial 
+support, send an email to [modules@gruntwork.io](mailto:modules@gruntwork.io?Subject=Vault%20Module). 
 Gruntwork can help with:
 
-* Setup, customization, and support for this Blueprint.
-* Blueprints for other types of infrastructure, such as VPCs, Docker clusters, databases, and continuous integration.
-* Blueprints that meet compliance requirements, such as HIPAA.
+* Setup, customization, and support for this Module.
+* Module for other types of infrastructure, such as VPCs, Docker clusters, databases, and continuous integration.
+* Module that meet compliance requirements, such as HIPAA.
 * Consulting & Training on AWS, Terraform, and DevOps.
 
 
 
-## How do you use this Blueprint?
+## How do you use this Module?
 
-Each Blueprint has the following folder structure:
+Each Module has the following folder structure:
 
-* [modules](/modules): This folder contains the reusable code for this Blueprint, broken down into one or more modules.
+* [modules](/modules): This folder contains the reusable code for this Module, broken down into one or more modules.
 * [examples](/examples): This folder contains examples of how to use the modules.
 * [test](/test): Automated tests for the modules and examples.
 
@@ -76,57 +72,42 @@ To deploy Vault with this Blueprint, you will need to deploy two separate cluste
 [Consul](https://www.consul.io/) servers (which Vault uses as a [high availability 
 backend](https://www.vaultproject.io/docs/concepts/ha.html)) and one to run Vault servers. 
 
-To deploy the Consul server cluster, use the [Consul AWS Blueprint](https://github.com/gruntwork-io/consul-aws-blueprint). 
+To deploy the Consul server cluster, use the [Consul AWS Module](https://github.com/gruntwork-io/terraform-consul-azure). 
 
 To deploy the Vault cluster:
 
-1. Create an AMI that has Vault installed (using the [install-vault module](/modules/install-vault)) and the Consul
+1. Create an Azure Image that has Vault installed (using the [install-vault module](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/install-vault)) and the Consul
    agent installed (using the [install-consul 
-   module](https://github.com/gruntwork-io/consul-aws-blueprint/tree/master/modules/install-consul)). Here is an 
-   [example Packer template](/examples/vault-consul-ami). 
+   module](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-consul)). Here is an 
+   [example Packer template](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/examples/vault-consul-image). 
    
-   If you are just experimenting with this Blueprint, you may find it more convenient to use one of our official public AMIs:
-   - [Latest Ubuntu 16 AMIs](/_docs/ubuntu16-ami-list.md).
-   - [Latest Amazon Linux AMIs](/_docs/amazon-linux-ami-list.md).
-   
-   **WARNING! Do NOT use these AMIs in your production setup. In production, you should build your own AMIs in your 
-     own AWS account.**
+1. Deploy that Azure Image across a Scale Set in a private subnet using the Terraform [vault-cluster 
+   module](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/vault-cluster). 
 
-1. Deploy that AMI across an Auto Scaling Group in a private subnet using the Terraform [vault-cluster 
-   module](/modules/vault-cluster). 
-
-1. Execute the [run-consul script](https://github.com/gruntwork-io/consul-aws-blueprint/tree/master/modules/run-consul)
+1. Execute the [run-consul script](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/run-consul)
    with the `--client` flag during boot on each Instance to have the Consul agent connect to the Consul server cluster. 
 
-1. Execute the [run-vault](/modules/run-vault) script during boot on each Instance to create the Vault cluster. 
+1. Execute the [run-vault](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/run-vault) script during boot on each Instance to create the Vault cluster. 
 
-1. If you only need to access Vault from inside your AWS account (recommended), run the [install-dnsmasq 
-   module](https://github.com/gruntwork-io/consul-aws-blueprint/tree/master/modules/install-dnsmasq) on each server, and 
+1. If you only need to access Vault from inside your Azure account (recommended), run the [install-dnsmasq 
+   module](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-dnsmasq) on each server, and 
    that server will be able to reach Vault using the Consul Server cluster as the DNS resolver (e.g. using an address 
-   like `vault.service.consul`). See the [vault-cluster-private example](/examples/vault-cluster-private) for working 
+   like `vault.service.consul`). See the [main example](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/MAIN.md) for working 
    sample code.
 
-1. If you need to access Vault from the public Internet, deploy the [vault-elb module](/modules/vault-elb) in a public 
-   subnet and have all requests to Vault go through the ELB. See the [vault-cluster-public 
-   example](/examples/vault-cluster-public) for working sample code.
-
-1. Head over to the [How do you use the Vault cluster?](/modules/vault-cluster#how-do-you-use-the-vault-cluster) guide
+1. Head over to the [How do you use the Vault cluster?](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/vault-cluster#how-do-you-use-the-vault-cluster) guide
    to learn how to initialize, unseal, and use Vault.
 
  
- 
-
-
-
-## How do I contribute to this Blueprint?
+## How do I contribute to this Module?
 
 Contributions are very welcome! Check out the [Contribution Guidelines](/CONTRIBUTING.md) for instructions.
 
 
 
-## How is this Blueprint versioned?
+## How is this Module versioned?
 
-This Blueprint follows the principles of [Semantic Versioning](http://semver.org/). You can find each new release, 
+This Module follows the principles of [Semantic Versioning](http://semver.org/). You can find each new release, 
 along with the changelog, in the [Releases Page](../../releases). 
 
 During initial development, the major version will be 0 (e.g., `0.x.y`), which indicates the code does not yet have a 
