@@ -123,9 +123,13 @@ function wait_for_vault_server_to_come_up {
 }
 
 function print_instructions {
-  local num_servers=$(get_required_terraform_output "vault_cluster_size")
-  local load_balancer_ip=$(get_required_terraform_output "load_balancer_ip_address")
-  local admin_user_name=$(get_required_terraform_output "vault_admin_user_name")
+  local num_servers
+  local load_balancer_ip
+  local admin_user_name
+
+  num_servers=$(get_required_terraform_output "vault_cluster_size")
+  load_balancer_ip=$(get_required_terraform_output "load_balancer_ip_address")
+  admin_user_name=$(get_required_terraform_output "vault_admin_user_name")
 
   local instructions=()
   instructions+=("\nYour Vault servers are running behind the load balancer at the following IP address:\n\n${load_balancer_ip/#/    }\n")
@@ -135,7 +139,8 @@ function print_instructions {
   instructions+=("    vault init")
 
   instructions+=("\nTo unseal your Vault cluster, SSH to each of the servers and run the unseal command with 3 of the 5 unseal keys:\n")
-  local counter=0
+  local counter
+  counter=0
 
   while [[  $counter -lt $num_servers ]]; do
     instructions+=("    ssh -p 220${counter} $admin_user_name@$load_balancer_ip")
