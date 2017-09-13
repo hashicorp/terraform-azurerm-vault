@@ -1,35 +1,19 @@
-output "asg_name" {
-  value = "${aws_autoscaling_group.autoscaling_group.name}"
-}
-
-output "cluster_tag_key" {
-  value = "${var.cluster_tag_key}"
-}
-
-output "cluster_tag_value" {
+output "scale_set_name" {
   value = "${var.cluster_name}"
 }
 
+output "admin_user_name" {
+  value = "${var.vault_admin_user_name}"
+}
+
 output "cluster_size" {
-  value = "${aws_autoscaling_group.autoscaling_group.desired_capacity}"
+  value = "${var.cluster_size}"
 }
 
-output "launch_config_name" {
-  value = "${aws_launch_configuration.launch_configuration.name}"
+output "storage_containter_id" {
+  value = "${azurerm_storage_container.vault.id}"
 }
 
-output "iam_role_arn" {
-  value = "${aws_iam_role.instance_role.arn}"
-}
-
-output "iam_role_id" {
-  value = "${aws_iam_role.instance_role.id}"
-}
-
-output "security_group_id" {
-  value = "${aws_security_group.lc_security_group.id}"
-}
-
-output "s3_bucket_arn" {
-  value = "${aws_s3_bucket.vault_storage.arn}"
+output "load_balancer_ip_address" {
+  value = "${azurerm_public_ip.vault_access.ip_address}"
 }

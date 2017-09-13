@@ -1,210 +1,229 @@
-# ---------------------------------------------------------------------------------------------------------------------
-# THESE TEMPLATES REQUIRE TERRAFORM VERSION 0.8 AND ABOVE
-# ---------------------------------------------------------------------------------------------------------------------
-
 terraform {
-  required_version = ">= 0.9.3"
+  required_version = ">= 0.10.0"
 }
 
+#---------------------------------------------------------------------------------------------------------------------
+# CREATE STORAGE BUCKET
 # ---------------------------------------------------------------------------------------------------------------------
-# CREATE AN AUTO SCALING GROUP (ASG) TO RUN VAULT
-# ---------------------------------------------------------------------------------------------------------------------
+resource "azurerm_storage_container" "vault" {
+  name                  = "${var.storage_container_name}"
+  resource_group_name   = "${var.resource_group_name}"
+  storage_account_name  = "${var.storage_account_name}"
+  container_access_type = "private"
+}
 
-resource "aws_autoscaling_group" "autoscaling_group" {
-  launch_configuration = "${aws_launch_configuration.launch_configuration.name}"
+#---------------------------------------------------------------------------------------------------------------------
+# CREATE A LOAD BALANCER
+#---------------------------------------------------------------------------------------------------------------------
+resource "azurerm_public_ip" "vault_access" {
+  count = "${var.associate_public_ip_address_load_balancer ? 1 : 0}"
+  name = "${var.cluster_name}_access"
+  location = "${var.location}"
+  resource_group_name = "${var.resource_group_name}"
+  public_ip_address_allocation = "static"
+  domain_name_label = "${var.cluster_name}"
+}
 
-  availability_zones  = ["${var.availability_zones}"]
-  vpc_zone_identifier = ["${var.subnet_ids}"]
+resource "azurerm_lb" "vault_access" {
+  count = "${var.associate_public_ip_address_load_balancer ? 1 : 0}"
+  name = "${var.cluster_name}_access"
+  location = "${var.location}"
+  resource_group_name = "${var.resource_group_name}"
 
-  # Use a fixed-size cluster
-  min_size             = "${var.cluster_size}"
-  max_size             = "${var.cluster_size}"
-  desired_capacity     = "${var.cluster_size}"
-  termination_policies = ["${var.termination_policies}"]
-
-  target_group_arns         = ["${var.target_group_arns}"]
-  load_balancers            = ["${var.load_balancers}"]
-  health_check_type         = "${var.health_check_type}"
-  health_check_grace_period = "${var.health_check_grace_period}"
-  wait_for_capacity_timeout = "${var.wait_for_capacity_timeout}"
-
-  tag {
-    key                 = "${var.cluster_tag_key}"
-    value               = "${var.cluster_name}"
-    propagate_at_launch = true
+  frontend_ip_configuration {
+    name = "PublicIPAddress"
+    public_ip_address_id = "${azurerm_public_ip.vault_access.id}"
   }
 }
 
+resource "azurerm_lb_nat_pool" "vault_lbnatpool" {
+  count = "${var.associate_public_ip_address_load_balancer ? 1 : 0}"
+  resource_group_name = "${var.resource_group_name}"
+  name = "ssh"
+  loadbalancer_id = "${azurerm_lb.vault_access.id}"
+  protocol = "Tcp"
+  frontend_port_start = 2200
+  frontend_port_end = 2299
+  backend_port = 22
+  frontend_ip_configuration_name = "PublicIPAddress"
+}
+
+resource "azurerm_lb_probe" "vault_probe" {
+  resource_group_name = "${var.resource_group_name}"
+  loadbalancer_id = "${azurerm_lb.vault_access.id}"
+  name                = "vault-running-probe"
+  port                = "${var.api_port}"
+}
+
+resource "azurerm_lb_backend_address_pool" "vault_bepool" {
+  count = "${var.associate_public_ip_address_load_balancer ? 1 : 0}"
+  resource_group_name = "${var.resource_group_name}"
+  loadbalancer_id = "${azurerm_lb.vault_access.id}"
+  name = "BackEndAddressPool"
+}
+
+resource "azurerm_lb_rule" "vault_api_port" {
+  count = "${var.associate_public_ip_address_load_balancer ? 1 : 0}"
+  resource_group_name = "${var.resource_group_name}"
+  name = "vault-api"
+  loadbalancer_id = "${azurerm_lb.vault_access.id}"
+  protocol = "Tcp"
+  frontend_port = "${var.api_port}"
+  backend_port = "${var.api_port}"
+  frontend_ip_configuration_name = "PublicIPAddress"
+  backend_address_pool_id = "${azurerm_lb_backend_address_pool.vault_bepool.id}"
+  probe_id = "${azurerm_lb_probe.vault_probe.id}"
+}
+
+#---------------------------------------------------------------------------------------------------------------------
+# CREATE A VIRTUAL MACHINE SCALE SET TO RUN VAULT (WITHOUT LOAD BALANCER)
 # ---------------------------------------------------------------------------------------------------------------------
-# CREATE LAUNCH CONFIGURATION TO DEFINE WHAT RUNS ON EACH INSTANCE IN THE ASG
-# ---------------------------------------------------------------------------------------------------------------------
 
-resource "aws_launch_configuration" "launch_configuration" {
-  name_prefix   = "${var.cluster_name}-"
-  image_id      = "${var.ami_id}"
-  instance_type = "${var.instance_type}"
-  user_data     = "${var.user_data}"
+resource "azurerm_virtual_machine_scale_set" "vault" {
+  count = "${var.associate_public_ip_address_load_balancer ? 0 : 1}"
+  name = "${var.cluster_name}"
+  location = "${var.location}"
+  resource_group_name = "${var.resource_group_name}"
+  upgrade_policy_mode = "Manual"
 
-  iam_instance_profile        = "${aws_iam_instance_profile.instance_profile.name}"
-  key_name                    = "${var.ssh_key_name}"
-  security_groups             = ["${aws_security_group.lc_security_group.id}"]
-  placement_tenancy           = "${var.tenancy}"
-  associate_public_ip_address = "${var.associate_public_ip_address}"
-
-  ebs_optimized = "${var.root_volume_ebs_optimized}"
-
-  root_block_device {
-    volume_type           = "${var.root_volume_type}"
-    volume_size           = "${var.root_volume_size}"
-    delete_on_termination = "${var.root_volume_delete_on_termination}"
+  sku {
+    name = "${var.instance_size}"
+    tier = "${var.instance_tier}"
+    capacity = "${var.cluster_size}"
   }
 
-  # Important note: whenever using a launch configuration with an auto scaling group, you must set
-  # create_before_destroy = true. However, as soon as you set create_before_destroy = true in one resource, you must
-  # also set it in every resource that it depends on, or you'll get an error about cyclic dependencies (especially when
-  # removing resources). For more info, see:
-  #
-  # https://www.terraform.io/docs/providers/aws/r/launch_configuration.html
-  # https://terraform.io/docs/configuration/resources.html
-  lifecycle {
-    create_before_destroy = true
+  os_profile {
+    computer_name_prefix = "${var.vault_computer_name_prefix}"
+    admin_username = "${var.vault_admin_user_name}"
+
+    #This password is unimportant as it is disabled below in the os_profile_linux_config
+    admin_password = "Passwword1234"
+    custom_data = "${var.custom_data}"
   }
-}
 
-# ---------------------------------------------------------------------------------------------------------------------
-# CREATE A SECURITY GROUP TO CONTROL WHAT REQUESTS CAN GO IN AND OUT OF EACH EC2 INSTANCE
-# ---------------------------------------------------------------------------------------------------------------------
+  os_profile_linux_config {
+    disable_password_authentication = true
 
-resource "aws_security_group" "lc_security_group" {
-  name_prefix = "${var.cluster_name}"
-  description = "Security group for the ${var.cluster_name} launch configuration"
-  vpc_id      = "${var.vpc_id}"
-
-  # aws_launch_configuration.launch_configuration in this module sets create_before_destroy to true, which means
-  # everything it depends on, including this resource, must set it as well, or you'll get cyclic dependency errors
-  # when you try to do a terraform destroy.
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_security_group_rule" "allow_ssh_inbound_from_cidr_blocks" {
-  type        = "ingress"
-  from_port   = "${var.ssh_port}"
-  to_port     = "${var.ssh_port}"
-  protocol    = "tcp"
-  cidr_blocks = ["${var.allowed_ssh_cidr_blocks}"]
-
-  security_group_id = "${aws_security_group.lc_security_group.id}"
-}
-
-resource "aws_security_group_rule" "allow_ssh_inbound_from_security_group_ids" {
-  count                    = "${length(var.allowed_inbound_security_group_ids)}"
-  type                     = "ingress"
-  from_port                = "${var.ssh_port}"
-  to_port                  = "${var.ssh_port}"
-  protocol                 = "tcp"
-  source_security_group_id = "${element(var.allowed_inbound_security_group_ids, count.index)}"
-
-  security_group_id = "${aws_security_group.lc_security_group.id}"
-}
-
-resource "aws_security_group_rule" "allow_all_outbound" {
-  type        = "egress"
-  from_port   = 0
-  to_port     = 0
-  protocol    = "-1"
-  cidr_blocks = ["0.0.0.0/0"]
-
-  security_group_id = "${aws_security_group.lc_security_group.id}"
-}
-
-# ---------------------------------------------------------------------------------------------------------------------
-# THE INBOUND/OUTBOUND RULES FOR THE SECURITY GROUP COME FROM THE VAULT-SECURITY-GROUP-RULES MODULE
-# ---------------------------------------------------------------------------------------------------------------------
-
-module "security_group_rules" {
-  source = "../vault-security-group-rules"
-
-  security_group_id                  = "${aws_security_group.lc_security_group.id}"
-  allowed_inbound_cidr_blocks        = ["${var.allowed_inbound_cidr_blocks}"]
-  allowed_inbound_security_group_ids = ["${var.allowed_inbound_security_group_ids}"]
-
-  api_port     = "${var.api_port}"
-  cluster_port = "${var.cluster_port}"
-}
-
-# ---------------------------------------------------------------------------------------------------------------------
-# ATTACH AN IAM ROLE TO EACH EC2 INSTANCE
-# We can use the IAM role to grant the instance IAM permissions so we can use the AWS APIs without having to figure out
-# how to get our secret AWS access keys onto the box.
-# ---------------------------------------------------------------------------------------------------------------------
-
-resource "aws_iam_instance_profile" "instance_profile" {
-  name_prefix = "${var.cluster_name}"
-  path        = "${var.instance_profile_path}"
-  role        = "${aws_iam_role.instance_role.name}"
-
-  # aws_launch_configuration.launch_configuration in this module sets create_before_destroy to true, which means
-  # everything it depends on, including this resource, must set it as well, or you'll get cyclic dependency errors
-  # when you try to do a terraform destroy.
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_iam_role" "instance_role" {
-  name_prefix        = "${var.cluster_name}"
-  assume_role_policy = "${data.aws_iam_policy_document.instance_role.json}"
-
-  # aws_iam_instance_profile.instance_profile in this module sets create_before_destroy to true, which means
-  # everything it depends on, including this resource, must set it as well, or you'll get cyclic dependency errors
-  # when you try to do a terraform destroy.
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-data "aws_iam_policy_document" "instance_role" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
+    ssh_keys {
+      path = "/home/${var.vault_admin_user_name}/.ssh/authorized_keys"
+      key_data = "${var.key_data}"
     }
   }
-}
 
-# ---------------------------------------------------------------------------------------------------------------------
-# CREATE AN S3 BUCKET TO USE AS A STORAGE BACKEND
-# Also, add an IAM role policy that gives the Vault servers access to this S3 bucket
-# ---------------------------------------------------------------------------------------------------------------------
+  network_profile {
+    name = "VaultNetworkProfile"
+    primary = true
 
-resource "aws_s3_bucket" "vault_storage" {
-  bucket        = "${var.s3_bucket_name}"
-  force_destroy = "${var.force_destroy_s3_bucket}"
+    ip_configuration {
+      name = "VaultIPConfiguration"
+      subnet_id = "${var.subnet_id}"
+    }
+  }
+
+  storage_profile_image_reference {
+    id = "${var.image_id}"
+  }
+
+  storage_profile_os_disk {
+    name = ""
+    caching = "ReadWrite"
+    create_option = "FromImage"
+    os_type = "Linux"
+    managed_disk_type = "Standard_LRS"
+  }
 
   tags {
-    Description = "Used for secret storage with Vault. DO NOT DELETE this Bucket unless you know what you are doing."
+    scaleSetName = "${var.cluster_name}"
   }
 }
 
-resource "aws_iam_role_policy" "vault_s3" {
-  name   = "vault_s3"
-  role   = "${aws_iam_role.instance_role.id}"
-  policy = "${data.aws_iam_policy_document.vault_s3.json}"
-}
+#---------------------------------------------------------------------------------------------------------------------
+# CREATE A VIRTUAL MACHINE SCALE SET TO RUN VAULT (WITH LOAD BALANCER)
+# ---------------------------------------------------------------------------------------------------------------------
 
-data "aws_iam_policy_document" "vault_s3" {
-  statement {
-    effect  = "Allow"
-    actions = ["s3:*"]
+resource "azurerm_virtual_machine_scale_set" "vault_with_load_balancer" {
+  count = "${var.associate_public_ip_address_load_balancer ? 1 : 0}"
+  name = "${var.cluster_name}"
+  location = "${var.location}"
+  resource_group_name = "${var.resource_group_name}"
+  upgrade_policy_mode = "Manual"
 
-    resources = [
-      "${aws_s3_bucket.vault_storage.arn}",
-      "${aws_s3_bucket.vault_storage.arn}/*",
-    ]
+  sku {
+    name = "${var.instance_size}"
+    tier = "${var.instance_tier}"
+    capacity = "${var.cluster_size}"
+  }
+
+  os_profile {
+    computer_name_prefix = "${var.vault_computer_name_prefix}"
+    admin_username = "${var.vault_admin_user_name}"
+
+    #This password is unimportant as it is disabled below in the os_profile_linux_config
+    admin_password = "Passwword1234"
+    custom_data = "${var.custom_data}"
+  }
+
+  os_profile_linux_config {
+    disable_password_authentication = true
+
+    ssh_keys {
+      path = "/home/${var.vault_admin_user_name}/.ssh/authorized_keys"
+      key_data = "${var.key_data}"
+    }
+  }
+
+  network_profile {
+    name = "VaultNetworkProfile"
+    primary = true
+
+    ip_configuration {
+      name = "VaultIPConfiguration"
+      subnet_id = "${var.subnet_id}"
+      load_balancer_backend_address_pool_ids = ["${azurerm_lb_backend_address_pool.vault_bepool.id}"]
+      load_balancer_inbound_nat_rules_ids = ["${element(azurerm_lb_nat_pool.vault_lbnatpool.*.id, count.index)}"]
+    }
+  }
+
+  storage_profile_image_reference {
+    id = "${var.image_id}"
+  }
+
+  storage_profile_os_disk {
+    name = ""
+    caching = "ReadWrite"
+    create_option = "FromImage"
+    os_type = "Linux"
+    managed_disk_type = "Standard_LRS"
+  }
+
+  tags {
+    scaleSetName = "${var.cluster_name}"
   }
 }
+
+#---------------------------------------------------------------------------------------------------------------------
+# CREATE A SECURITY GROUP AND RULES FOR SSH
+# ---------------------------------------------------------------------------------------------------------------------
+
+resource "azurerm_network_security_group" "vault" {
+  name = "${var.cluster_name}"
+  location = "${var.location}"
+  resource_group_name = "${var.resource_group_name}"
+}
+
+resource "azurerm_network_security_rule" "ssh" {
+  count = "${length(var.allowed_ssh_cidr_blocks)}"
+
+  access = "Allow"
+  destination_address_prefix = "*"
+  destination_port_range = "22"
+  direction = "Inbound"
+  name = "SSH${count.index}"
+  network_security_group_name = "${azurerm_network_security_group.vault.name}"
+  priority = "${100 + count.index}"
+  protocol = "Tcp"
+  resource_group_name = "${var.resource_group_name}"
+  source_address_prefix = "${element(var.allowed_ssh_cidr_blocks, count.index)}"
+  source_port_range = "1024-65535"
+}
+

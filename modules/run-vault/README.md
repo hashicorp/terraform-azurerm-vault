@@ -1,20 +1,14 @@
 # Vault Run Script
 
-This folder contains a script for configuring and running Vault on an [AWS](https://aws.amazon.com/) server. This 
-script has been tested on the following operating systems:
+This folder contains a script for configuring and running Vault on an [Azure](https://azure.microsoft.com/) server. This 
+script has been tested on the Ubuntu 16.04.
 
-* Ubuntu 16.04
-* Amazon Linux
-
-There is a good chance it will work on other flavors of Debian, CentOS, and RHEL as well.
-
-
-
+There is a good chance it will work on other flavors of Debian as well.
 
 ## Quick start
 
 This script assumes you installed it, plus all of its dependencies (including Vault itself), using the [install-vault 
-module](/modules/install-vault). The default install path is `/opt/vault/bin`, so to start Vault in server mode, you 
+module](https://github.com/gruntwork-io/terraform-consul-azure/modules/install-vault). The default install path is `/opt/vault/bin`, so to start Vault in server mode, you 
 run:
 
 ```
@@ -38,8 +32,8 @@ Data](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html#user-dat
 when the EC2 Instance is first booting. After running `run-vault` on that initial boot, the `supervisord` configuration 
 will automatically restart Vault if it crashes or the EC2 instance reboots.
 
-See the [vault-cluster-public](/examples/vault-cluster-public) and 
-[vault-cluster-private](/examples/vault-cluster-private) examples for fully-working sample code.
+See the [vault-cluster-public](https://github.com/gruntwork-io/terraform-consul-azure/examples/vault-cluster-public) and 
+[vault-cluster-private](https://github.com/gruntwork-io/terraform-consul-azure/examples/vault-cluster-private) examples for fully-working sample code.
 
 
 
@@ -48,8 +42,9 @@ See the [vault-cluster-public](/examples/vault-cluster-public) and
 
 The `run-vault` script accepts the following arguments:
 
-* `--s3-bucket` (required): Specifies the S3 bucket to use to store Vault data. 
-* `--s3-bucket-region` (required): Specifies the AWS region where `--s3-bucket` lives. 
+* `--azure-account-name` (required): Specifies the Azure storage account to use to store Vault data. 
+* `--azure-account-key` (required): Specifies the Azure account key for the `--azure-account-name`. 
+* `--azure-container` (required): Specifies the Azure container to use to store Vault data.
 * `--tls-cert-file` (required): Specifies the path to the certificate for TLS. To configure the listener to use a CA 
   certificate, concatenate the primary certificate and the CA certificate together. The primary certificate should 
   appear first in the combined file. See [How do you handle encryption?](#how-do-you_handle-encryption) for more info.
@@ -68,16 +63,13 @@ The `run-vault` script accepts the following arguments:
 Example:
 
 ```
-/opt/vault/bin/run-vault --s3-bucket my-vault-bucket --s3-bucket-region us-east-1 --tls-cert-file /opt/vault/tls/vault.crt.pem --tls-key-file /opt/vault/tls/vault.key.pem
+/opt/vault/bin/run-vault --azure-account-name my-account-name --azure-account-key [REDACTED] --azure-container my-container-name --tls-cert-file /opt/vault/tls/vault.crt.pem --tls-key-file /opt/vault/tls/vault.key.pem
 ```
-
-
-
 
 ## Vault configuration
 
 `run-vault` generates a configuration file for Vault called `default.hcl` that tries to figure out reasonable 
-defaults for a Vault cluster in AWS. Check out the [Vault Configuration Files 
+defaults for a Vault cluster in Azure. Check out the [Vault Configuration Files 
 documentation](https://www.vaultproject.io/docs/configuration/index.html) for what configuration settings are
 available.
   
@@ -86,14 +78,16 @@ available.
 
 `run-vault` sets the following configuration values by default:
 
-* [storage](https://www.vaultproject.io/docs/configuration/index.html#storage): Configure S3 as the storage backend
+* [storage](https://www.vaultproject.io/docs/configuration/index.html#storage): Configure Azure Container as the storage backend
   with the following settings:
  
-     * [bucket](https://www.vaultproject.io/docs/configuration/storage/s3.html#bucket): Set to the `--s3-bucket`
-       parameter.
-     * [region](https://www.vaultproject.io/docs/configuration/storage/s3.html#region): Set to the `--s3-bucket-region` 
-       parameter.
- 
+     * [accountName](https://www.vaultproject.io/docs/configuration/storage/azure.html#accountname): Set to the 
+     `--azure-account-name` parameter.
+     * [accountKey](https://www.vaultproject.io/docs/configuration/storage/azure.html#accountkey): Set to the 
+     `--azure-account-key` parameter.
+     * [container](https://www.vaultproject.io/docs/configuration/storage/azure.html#container): Set to the 
+     `--azure-container` parameter.
+      
 * [ha_storage](https://www.vaultproject.io/docs/configuration/index.html#ha_storage): Configure Consul as the [high 
   availability](https://www.vaultproject.io/docs/concepts/ha.html) storage backend with the following settings:
 
@@ -143,7 +137,7 @@ If you want to override *all* the default settings, you can tell `run-vault` not
 at all using the `--skip-vault-config` flag:
 
 ```
-/opt/vault/bin/run-vault --s3-bucket my-vault-bucket --s3-bucket-region us-east-1 --tls-cert-file /opt/vault/tls/vault.crt.pem --tls-key-file /opt/vault/tls/vault.key.pem --skip-vault-config
+/opt/vault/bin/run-vault --azure-account-name my-account-name --azure-account-key [REDACTED] --azure-container my-container-name --tls-cert-file /opt/vault/tls/vault.crt.pem --tls-key-file /opt/vault/tls/vault.key.pem --skip-vault-config
 ```
 
 
@@ -163,24 +157,20 @@ When you execute the `run-vault` script, you need to provide the paths to the pu
 certificate:
 
 ```
-/opt/vault/bin/run-vault --s3-bucket my-vault-bucket --s3-bucket-region us-east-1 --tls-cert-file /opt/vault/tls/vault.crt.pem --tls-key-file /opt/vault/tls/vault.key.pem
+/opt/vault/bin/run-vault --azure-account-name my-account-name --azure-account-key [REDACTED] --azure-container my-container-name --tls-cert-file /opt/vault/tls/vault.crt.pem --tls-key-file /opt/vault/tls/vault.key.pem
 ```
 
-See the [private-tls-cert module](/modules/private-tls-cert) for information on how to generate a TLS certificate.
+See the [private-tls-cert module](https://github.com/gruntwork-io/terraform-consul-azure/modules/private-tls-cert) for information on how to generate a TLS certificate.
 
 
 ### Consul encryption
 
-Since this Vault Blueprint uses Consul as a high availability storage backend, you may want to enable encryption for 
+Since this Vault Module uses Consul as a high availability storage backend, you may want to enable encryption for 
 Consul too. Note that Vault encrypts any data *before* sending it to a storage backend, so this isn't strictly 
 necessary, but may be a good extra layer of security.
 
 By default, the Vault server nodes communicate with a local Consul agent running on the same server over (unencrypted) 
 HTTP. However, you can configure those agents to talk to the Consul servers using TLS. Check out the [official Consul 
-encryption docs](https://www.consul.io/docs/agent/encryption.html) and the Consul AWS Blueprint [How do you handle 
-encryption docs](https://github.com/gruntwork-io/consul-aws-blueprint/tree/master/modules/run-consul#how-do-you-handle-encryption)
+encryption docs](https://www.consul.io/docs/agent/encryption.html) and the Consul Azure Module [How do you handle 
+encryption docs](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/run-consul#how-do-you-handle-encryption)
 for more info.
-
-
- 
-

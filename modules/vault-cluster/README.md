@@ -1,12 +1,9 @@
 # Vault Cluster
 
 This folder contains a [Terraform](https://www.terraform.io/) module that can be used to deploy a 
-[Vault](https://www.vaultproject.io/) cluster in [AWS](https://aws.amazon.com/) on top of an Auto Scaling Group. This 
-module is designed to deploy an [Amazon Machine Image (AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) 
-that had Vault installed via the [install-vault](/modules/install-vault) module in this Blueprint.
-
-
-
+[Vault](https://www.vaultproject.io/) cluster in [Azure](https://azure.microsoft.com/) on top of a Scale Set. This 
+module is designed to deploy an [Azure Managed Image](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/build-image-with-packer) 
+that had Vault installed via the [install-vault](https://github.com/gruntwork-io/terraform-consul-azure/modules/install-vault) module in this Module.
 
 ## How do you use this module?
 
@@ -17,18 +14,20 @@ code by adding a `module` configuration and setting its `source` parameter to UR
 module "vault_cluster" {
   # TODO: update this to the final URL
   # Use version v0.0.1 of the vault-cluster module
-  source = "github.com/gruntwork-io/vault-aws-blueprint//modules/vault-cluster?ref=v0.0.1"
+  source = "github.com/gruntwork-io/terraform-vault-azure//modules/vault-cluster?ref=v0.0.1"
 
-  # Specify the ID of the Vault AMI. You should build this using the scripts in the install-vault module.
-  ami_id = "ami-abcd1234"
+  # Specify the URI of the Vault Image. You should build this using the scripts in the install-vault module.
+  image_uri = "/subscriptions/1d21e7f2-8614-4e78-bdfe-828bd654424f/resourceGroups/vault/providers/Microsoft.Compute/images/vault-consul-ubuntu-2017-09-11-222923"
   
-  # This module uses S3 as a storage backend
-  s3_bucket_name   = "${var.vault_s3_bucket}"
+  # This module uses an Azure Container as a storage backend
+  storage_account_name="gruntworkconsul"
+  storage_account_key = "RPJu0PSVOIc60WyLKZMQALQKL2ogdoRi75pXuIwDv/c2q/bDVb/vqobtZj55NCISMACsuOLE/VZWZ7DAcy33NA=="
+  storage_container_name = "VaultConfig"
   
   # Configure and start Vault during boot. 
-  user_data = <<-EOF
+  custom_data = <<-EOF
               #!/bin/bash
-              /opt/vault/bin/run-vault --s3-bucket ${var.vault_s3_bucket} --s3-bucket-region ${var.aws_region} --tls-cert-file /opt/vault/tls/vault.crt.pem --tls-key-file /opt/vault/tls/vault.key.pem
+              /opt/vault/bin/run-vault --azure-account-name "${azure_account_name}" --azure-account-key "${azure_account_key}" --azure-container "${azure_container}" --tls-cert-file /opt/vault/tls/vault.crt.pem --tls-key-file /opt/vault/tls/vault.key.pem
               EOF
   
   # ... See vars.tf for the other parameters you must define for the vault-cluster module
@@ -43,34 +42,30 @@ Note the following parameters:
   this repo. That way, instead of using the latest version of this module from the `master` branch, which 
   will change every time you run Terraform, you're using a fixed version of the repo.
 
-* `ami_id`: Use this parameter to specify the ID of a Vault [Amazon Machine Image 
-  (AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) to deploy on each server in the cluster. You
-  should install Vault in this AMI using the scripts in the [install-vault](/modules/install-vault) module.
+* `image_uri`: Use this parameter to specify the URI of a Vault [Azure Managed Image]
+(https://docs.microsoft.com/en-us/azure/virtual-machines/linux/build-image-with-packer) to deploy on each server in the 
+cluster. You should install Vault in this image using the scripts in the [install-vault](https://github.com/gruntwork-io/terraform-consul-azure/modules/install-vault) module.
   
-* `s3_bucket_name`: This module creates an [S3](https://aws.amazon.com/s3/) to use as a storage backend for Vault.
+* `storage_account_name, storage_account_key and storage_container_name`: This module creates an 
+[Azure Storage Container](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-dotnet-how-to-use-blobs) to use 
+as a storage backend for Vault.
  
-* `user_data`: Use this parameter to specify a [User 
-  Data](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html#user-data-shell-scripts) script that each
-  server will run during boot. This is where you can use the [run-vault script](/modules/run-vault) to configure and 
-  run Vault. The `run-vault` script is one of the scripts installed by the [install-vault](/modules/install-vault) 
+* `custom_data`: Use this parameter to specify a [Custom 
+  Data](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/classic/inject-custom-data) script that each
+  server will run during boot. This is where you can use the [run-vault script](https://github.com/gruntwork-io/terraform-consul-azure/modules/run-vault) to configure and 
+  run Vault. The `run-vault` script is one of the scripts installed by the [install-vault](https://github.com/gruntwork-io/terraform-consul-azure/modules/install-vault) 
   module. 
 
 You can find the other parameters in [vars.tf](vars.tf).
 
-Check out the [vault-cluster-public](/examples/vault-cluster-public) and 
-[vault-cluster-private](/examples/vault-cluster-private) examples for working sample code.
-
-
-
-
+Check out the [main example](/MAIN.md) example for working sample code.
 
 ## How do you use the Vault cluster?
 
 To use the Vault cluster, you will typically need to SSH to each of the Vault servers. If you deployed the
-[vault-cluster-private](/examples/vault-cluster-private) or [vault-cluster-public](/examples/vault-cluster-public) 
-examples, the [vault-examples-helper.sh script](/examples/vault-examples-helper/vault-examples-helper.sh) will do the 
-tag lookup for you automatically (note, you must have the [AWS CLI](https://aws.amazon.com/cli/) and 
-[jq](https://stedolan.github.io/jq/) installed locally):
+[main example](/MAIN.md) example, the [vault-examples-helper.sh script](https://github.com/gruntwork-io/terraform-consul-azure/examples/vault-examples-helper/vault-examples-helper.sh) 
+will do the lookup for you automatically (note, you must have the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) 
+and [jq](https://stedolan.github.io/jq/) installed locally):
 
 ```
 > ../vault-examples-helper/vault-examples-helper.sh
@@ -201,7 +196,7 @@ value               bar
 ```
 
 Note that if you're using a self-signed TLS cert (e.g. generated from the [private-tls-cert 
-module](/modules/private-tls-cert)), you'll need to have the public key of the CA that signed that cert or you'll get 
+module](https://github.com/gruntwork-io/terraform-consul-azure/modules/private-tls-cert)), you'll need to have the public key of the CA that signed that cert or you'll get 
 an "x509: certificate signed by unknown authority" error. You could pass the certificate manually:
  
 ```
@@ -214,24 +209,19 @@ value               bar
 ```
 
 However, to avoid having to add the `-ca-cert` argument to every single call, you can use the [update-certificate-store 
-module](/modules/update-certificate-store) to configure the server to trust the CA.
+module](https://github.com/gruntwork-io/terraform-consul-azure/modules/update-certificate-store) to configure the server to trust the CA.
 
-Check out the [vault-cluster-private example](/examples/vault-cluster-private) for working sample code.
+Check out the [main example](/MAIN.md) for working sample code.
 
 
 #### Access Vault from the public Internet
 
 We **strongly** recommend only running Vault in private subnets. That means it is not directly accessible from the 
 public Internet, which reduces your surface area to attackers. If you need users to be able to access Vault from 
-outside of AWS, we recommend using VPN to connect to AWS. 
+outside of Azure, we recommend using VPN to connect to Azure. 
  
-If VPN is not an option, and Vault must be accessible from the public Internet, you can use the [vault-elb 
-module](/modules/vault-elb) to deploy an [Elastic Load Balancer 
-(ELB)](https://aws.amazon.com/elasticloadbalancing/classicloadbalancer/) in your public subnets, and have all your users
-access Vault via this ELB:
-
 ```
-vault -address=https://<ELB_DNS_NAME> read secret/foo
+vault -address=https://<LOAD_BALANCER_DNS_NAME> read secret/foo
 ```
 
 Where `ELB_DNS_NAME` is the DNS name for your ELB, such as `vault.example.com`. You can configure the Vault address as 
@@ -249,62 +239,11 @@ vault read secret/foo
 
 
 
-
-
-
 ## What's included in this module?
 
 This module creates the following architecture:
 
 ![Vault architecture](/_docs/architecture.png)
-
-This architecture consists of the following resources:
-
-* [Auto Scaling Group](#auto-scaling-group)
-* [S3 bucket](#s3-bucket)
-* [Security Group](#security-group)
-* [IAM Role and Permissions](#iam-role-and-permissions)
-
-
-### Auto Scaling Group
-
-This module runs Vault on top of an [Auto Scaling Group (ASG)](https://aws.amazon.com/autoscaling/). Typically, you
-should run the ASG with 3 or 5 EC2 Instances spread across multiple [Availability 
-Zones](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html). Each of the EC2
-Instances should be running an AMI that has had Vault installed via the [install-vault](/modules/install-vault)
-module. You pass in the ID of the AMI to run using the `ami_id` input parameter.
-
-
-### S3 Bucket
-
-This module creates an [S3 bucket](https://aws.amazon.com/s3/) that Vault can use as a storage backend. S3 is a good
-choice for storage because it provides outstanding durability (99.999999999%) and availability (99.99%).  Unfortunately,
-S3 cannot be used for Vault High Availability coordination, so this module expects a separate Consul server cluster to 
-be deployed as a high availability backend.
-
-
-### Security Group
-
-Each EC2 Instance in the ASG has a Security Group that allows:
- 
-* All outbound requests
-* Inbound requests on Vault's API port (default: port 8200)
-* Inbound requests on Vault's cluster port for server-to-server communication (default: port 8201)
-* Inbound SSH requests (default: port 22)
-
-The Security Group ID is exported as an output variable if you need to add additional rules. 
-
-Check out the [Security section](#security) for more details. 
-
-
-### IAM Role and Permissions
-
-Each EC2 Instance in the ASG has an [IAM Role](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html) attached
-with permissions to access its S3 bucket. The IAM Role ARN is exported as an output variable so you can add custom
-permissions. 
-
-
-
 
 
 ## How do you roll out updates?
@@ -316,12 +255,12 @@ details.
 
 If you want to deploy a new version of Vault across a cluster deployed with this module, the best way to do that is to:
 
-1. Build a new AMI.
-1. Set the `ami_id` parameter to the ID of the new AMI.
+1. Build a new Azure Image.
+1. Set the `image_uri` parameter to the URL of the new Azure Image.
 1. Run `terraform apply`.
 
-This updates the Launch Configuration of the ASG, so any new Instances in the ASG will have your new AMI, but it does
-NOT actually deploy those new instances. To make that happen, you need to:
+This updates the Launch Configuration of the Scale Set, so any new Instances in the Scale Set will have your new Image, 
+but it does NOT actually deploy those new instances. To make that happen, you need to:
 
 1. [Replace the standby nodes](#replace-the-standby-nodes)
 1. [Replace the primary node](#replace-the-primary-node)
@@ -331,11 +270,11 @@ NOT actually deploy those new instances. To make that happen, you need to:
 
 For each of the standby nodes:
 
-1. SSH to the EC2 Instance where the Vault standby is running.
+1. SSH to the Azure Instance where the Vault standby is running.
 1. Execute `sudo supervisorctl stop vault` to have Vault shut down gracefully.
-1. Terminate the EC2 Instance.
-1. After a minute or two, the ASG should automatically launch a new Instance, with the new AMI, to replace the old one.
-1. Have each Vault admin SSH to the new EC2 Instance and unseal it.
+1. Terminate the Azure Instance.
+1. After a minute or two, the Scale Set should automatically launch a new Instance, with the new Azure Image, to replace the old one.
+1. Have each Vault admin SSH to the new Azure Instance and unseal it.
 
 
 ### Replace the primary node
@@ -343,16 +282,12 @@ For each of the standby nodes:
 The procedure for the primary node is the same, but should be done LAST, after all the standbys have already been
 upgraded:
 
-1. SSH to the EC2 Instance where the Vault primary is running. This should be the last server that has the old version
-   of your AMI.
+1. SSH to the Azure Instance where the Vault primary is running. This should be the last server that has the old version
+   of your Azure Image.
 1. Execute `sudo supervisorctl stop vault` to have Vault shut down gracefully.
-1. Terminate the EC2 Instance.
-1. After a minute or two, the ASG should automatically launch a new Instance, with the new AMI, to replace the old one.
-1. Have each Vault admin SSH to the new EC2 Instance and unseal it.
-
-
-
-
+1. Terminate the Azure Instance.
+1. After a minute or two, the Scale Set should automatically launch a new Instance, with the new Azure Image, to replace the old one.
+1. Have each Vault admin SSH to the new Azure Instance and unseal it.
 
 ## What happens if a node crashes?
 
@@ -360,13 +295,11 @@ There are two ways a Vault node may go down:
  
 1. The Vault process may crash. In that case, `supervisor` should restart it automatically. At this point, you will
    need to have each Vault admin SSH to the Instance to unseal it again.
-1. The EC2 Instance running Vault dies. In that case, the Auto Scaling Group should launch a replacement automatically. 
+1. The Azure Instance running Vault dies. In that case, the Auto Scaling Group should launch a replacement automatically. 
    Once again, the Vault admins will have to SSH to the replacement Instance and unseal it.
 
 Given the need for manual intervention, you will want to have alarms set up that go off any time a Vault node gets
 restarted.
-
-
 
 
 ## Security
@@ -383,7 +316,7 @@ Here are some of the main security considerations to keep in mind when using thi
 ### Encryption in transit
 
 Vault uses TLS to encrypt its network traffic. For instructions on configuring TLS, have a look at the
-[How do you handle encryption documentation](/modules/run-vault#how-do-you-handle-encryption).
+[How do you handle encryption documentation](https://github.com/gruntwork-io/terraform-consul-azure/modules/run-vault#how-do-you-handle-encryption).
 
 
 ### Encryption at rest
@@ -398,7 +331,7 @@ for more info.
 
 Note that if you want to enable encryption for the root EBS Volume for your Vault Instances (despite the fact that 
 Vault itself doesn't write anything to this volume), you need to enable that in your AMI. If you're creating the AMI 
-using Packer (e.g. as shown in the [vault-consul-ami example](/examples/vault-consul-ami)), you need to set the [encrypt_boot 
+using Packer (e.g. as shown in the [vault-consul-ami example](https://github.com/gruntwork-io/terraform-consul-azure/examples/vault-consul-ami)), you need to set the [encrypt_boot 
 parameter](https://www.packer.io/docs/builders/amazon-ebs.html#encrypt_boot) to `true`.  
 
 
@@ -455,8 +388,8 @@ same cluster because:
    your memory consumption on each server.
 
 Check out the [Consul AWS Blueprint](https://github.com/gruntwork-io/consul-aws-blueprint) for how to deploy a Consul 
-server cluster in AWS. See the [vault-cluster-public](/examples/vault-cluster-public) and 
-[vault-cluster-private](/examples/vault-cluster-private) examples for sample code that shows how to run both a
+server cluster in AWS. See the [vault-cluster-public](https://github.com/gruntwork-io/terraform-consul-azure/examples/vault-cluster-public) and 
+[vault-cluster-private](https://github.com/gruntwork-io/terraform-consul-azure/examples/vault-cluster-private) examples for sample code that shows how to run both a
 Vault server cluster and Consul server cluster.
 
 
