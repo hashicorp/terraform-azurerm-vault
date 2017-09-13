@@ -94,13 +94,13 @@ variable "cluster_tag_value" {
 }
 
 variable "subnet_ids" {
-  description = "The subnet IDs into which the EC2 Instances should be deployed. We recommend one subnet ID per node in the cluster_size variable. At least one of var.subnet_ids or var.availability_zones must be non-empty."
+  description = "The subnet IDs into which the Azure Instances should be deployed. We recommend one subnet ID per node in the cluster_size variable. At least one of var.subnet_ids or var.availability_zones must be non-empty."
   type        = "list"
   default     = []
 }
 
 variable "allowed_ssh_cidr_blocks" {
-  description = "A list of CIDR-formatted IP address ranges from which the EC2 Instances will allow SSH connections"
+  description = "A list of CIDR-formatted IP address ranges from which the Azure Instances will allow SSH connections"
   type        = "list"
   default     = []
 }

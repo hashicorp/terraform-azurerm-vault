@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script is used to configure and run Vault on an AWS server.
+# This script is used to configure and run Vault on an Azure server.
 
 set -e
 
@@ -18,7 +18,7 @@ function print_usage {
   echo
   echo "Usage: run-vault [OPTIONS]"
   echo
-  echo "This script is used to configure and run Vault on an AWS server."
+  echo "This script is used to configure and run Vault on an Azure server."
   echo
   echo "Options:"
   echo
