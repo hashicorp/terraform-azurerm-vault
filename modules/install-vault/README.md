@@ -23,7 +23,7 @@ You can then run the `run-vault` script when the server is booting to start Vaul
 We recommend running the `install-vault` script as part of a [Packer](https://www.packer.io/) template to create a
 Vault [Azure Managed Image](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/build-image-with-packer) (see the 
 [vault-consul-image example](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/examples/vault-consul-image) 
-for sample code). You can then deploy the Azure Image across a Scale Setthe [vault-cluster module](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/vault-cluster) 
+for sample code). You can then deploy the Azure Image across a Scale Set 
 (see the [main example](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/MAIN.md) for fully-working sample code).
 
 ## Command line Arguments

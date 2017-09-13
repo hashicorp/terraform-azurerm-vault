@@ -25,10 +25,10 @@ This will:
 
 1. Tell Supervisor to load the new configuration file, thereby starting Vault.
 
-We recommend using the `run-vault` command as part of [User 
-Data](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html#user-data-shell-scripts), so that it executes
-when the EC2 Instance is first booting. After running `run-vault` on that initial boot, the `supervisord` configuration 
-will automatically restart Vault if it crashes or the EC2 instance reboots.
+We recommend using the `run-vault` command as part of [Custom 
+Data](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/classic/inject-custom-data), so that it executes
+when the Azure Instance is first booting. After running `run-vault` on that initial boot, the `supervisord` configuration 
+will automatically restart Vault if it crashes or the Azure instance reboots.
 
 See the [main example](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/MAIN.md) for fully-working sample code.
 

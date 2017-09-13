@@ -62,6 +62,7 @@ Gruntwork can help with:
 
 Each Module has the following folder structure:
 
+* [root](/): The root folder contains an example of running a public Vault cluster on Azure
 * [modules](/modules): This folder contains the reusable code for this Module, broken down into one or more modules.
 * [examples](/examples): This folder contains examples of how to use the modules.
 * [test](/test): Automated tests for the modules and examples.
@@ -72,7 +73,7 @@ To deploy Vault with this Blueprint, you will need to deploy two separate cluste
 [Consul](https://www.consul.io/) servers (which Vault uses as a [high availability 
 backend](https://www.vaultproject.io/docs/concepts/ha.html)) and one to run Vault servers. 
 
-To deploy the Consul server cluster, use the [Consul AWS Module](https://github.com/gruntwork-io/terraform-consul-azure). 
+To deploy the Consul server cluster, use the [Consul Azure Module](https://github.com/gruntwork-io/terraform-consul-azure). 
 
 To deploy the Vault cluster:
 
