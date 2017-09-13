@@ -1,18 +1,16 @@
 # Vault Run Script
 
 This folder contains a script for configuring and running Vault on an [Azure](https://azure.microsoft.com/) server. This 
-script has been tested on the Ubuntu 16.04.
-
-There is a good chance it will work on other flavors of Debian as well.
+script has been tested on Ubuntu 16.04. There is a good chance it will work on other flavors of Debian as well.
 
 ## Quick start
 
 This script assumes you installed it, plus all of its dependencies (including Vault itself), using the [install-vault 
-module](https://github.com/gruntwork-io/terraform-consul-azure/modules/install-vault). The default install path is `/opt/vault/bin`, so to start Vault in server mode, you 
-run:
+module](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/install-vault). The default install path is 
+`/opt/vault/bin`, so to start Vault in server mode, you run:
 
 ```
-/opt/vault/bin/run-vault --s3-bucket my-vault-bucket --s3-bucket-region us-east-1 --tls-cert-file /opt/vault/tls/vault.crt.pem --tls-key-file /opt/vault/tls/vault.key.pem
+/opt/vault/bin/run-vault -azure-account-name my-account-name --azure-account-key [REDACTED] --azure-container "Vault" --tls-cert-file /opt/vault/tls/vault.crt.pem --tls-key-file /opt/vault/tls/vault.key.pem
 ```
 
 This will:
@@ -32,10 +30,7 @@ Data](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html#user-dat
 when the EC2 Instance is first booting. After running `run-vault` on that initial boot, the `supervisord` configuration 
 will automatically restart Vault if it crashes or the EC2 instance reboots.
 
-See the [vault-cluster-public](https://github.com/gruntwork-io/terraform-consul-azure/examples/vault-cluster-public) and 
-[vault-cluster-private](https://github.com/gruntwork-io/terraform-consul-azure/examples/vault-cluster-private) examples for fully-working sample code.
-
-
+See the [main example](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/MAIN.md) for fully-working sample code.
 
 
 ## Command line Arguments
@@ -98,12 +93,10 @@ available.
     * [path](https://www.vaultproject.io/docs/configuration/storage/consul.html#path): Set to `vault/`.
     * [service](https://www.vaultproject.io/docs/configuration/storage/consul.html#service): Set to `vault`.  
     * [redirect_addr](https://www.vaultproject.io/docs/configuration/storage/consul.html#redirect_addr): 
-      Set to `https://<PRIVATE_IP>:<CLUSTER_PORT>` where `PRIVATE_IP` is the Instance's private IP fetched from
-      [Metadata](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html) and `CLUSTER_PORT` is
+      Set to `https://<PRIVATE_IP>:<CLUSTER_PORT>` where `PRIVATE_IP` is the Instance's private IP and `CLUSTER_PORT` is
       the value passed to `--cluster-port`.  
     * [cluster_addr](https://www.vaultproject.io/docs/configuration/storage/consul.html#cluster_addr): 
-      Set to `https://<PRIVATE_IP>:<CLUSTER_PORT>` where `PRIVATE_IP` is the Instance's private IP fetched from
-      [Metadata](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html) and `CLUSTER_PORT` is
+      Set to `https://<PRIVATE_IP>:<CLUSTER_PORT>` where `PRIVATE_IP` is the Instance's private IP and `CLUSTER_PORT` is
       the value passed to `--cluster-port`.
       
 * [listener](https://www.vaultproject.io/docs/configuration/index.html#listener): Configure a [TCP 
@@ -160,7 +153,7 @@ certificate:
 /opt/vault/bin/run-vault --azure-account-name my-account-name --azure-account-key [REDACTED] --azure-container my-container-name --tls-cert-file /opt/vault/tls/vault.crt.pem --tls-key-file /opt/vault/tls/vault.key.pem
 ```
 
-See the [private-tls-cert module](https://github.com/gruntwork-io/terraform-consul-azure/modules/private-tls-cert) for information on how to generate a TLS certificate.
+See the [private-tls-cert module](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/private-tls-cert) for information on how to generate a TLS certificate.
 
 
 ### Consul encryption

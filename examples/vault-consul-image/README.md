@@ -1,6 +1,6 @@
 # Vault and Consul AMI
 
-This folder shows an example of how to use the [install-vault module](https://github.com/gruntwork-io/terraform-consul-azure/modules/install-vault) from this Module and 
+This folder shows an example of how to use the [install-vault module](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/install-vault) from this Module and 
 the [install-consul](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-consul)
 and [install-dnsmasq](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-dnsmasq) modules
 from the Consul AWS Module with [Packer](https://www.packer.io/) to create an 
@@ -8,12 +8,12 @@ from the Consul AWS Module with [Packer](https://www.packer.io/) to create an
 Vault and Consul installed on top of Ubuntu 16.04.
 
 You can use this Image to deploy a [Vault cluster](https://www.vaultproject.io/) by using the [vault-cluster
-module](https://github.com/gruntwork-io/terraform-consul-azure/modules/vault-cluster). This Vault cluster will use Consul as its HA backend, so you can also use the 
+module](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/vault-cluster). This Vault cluster will use Consul as its HA backend, so you can also use the 
 same Image to deploy a separate [Consul server cluster](https://www.consul.io/) by using the [consul-cluster 
 module](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/consul-cluster). 
 
 Check out the [main example](/MAIN.md) for working sample code. For more info on Vault 
-installation and configuration, check out the [install-vault](https://github.com/gruntwork-io/terraform-consul-azure/modules/install-vault) documentation.
+installation and configuration, check out the [install-vault](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/install-vault) documentation.
 
 ## Quick start
 
@@ -24,15 +24,15 @@ To build the Vault and Consul Azure Image:
 1. Configure your Azure credentials by setting the `ARM_SUBSCRIPTION_ID`, `ARM_CLIENT_ID`, `ARM_CLIENT_SECRET` and 
 `ARM_TENANT_ID` environment variables.
 
-1. Use the [private-tls-cert module](https://github.com/gruntwork-io/terraform-consul-azure/modules/private-tls-cert) to generate a CA cert and public and private keys for a 
+1. Use the [private-tls-cert module](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/private-tls-cert) to generate a CA cert and public and private keys for a 
    TLS cert: 
    
     1. Set the `dns_names` parameter to `vault.service.consul`. If you're using the [vault-cluster-public
-       example](https://github.com/gruntwork-io/terraform-consul-azure/examples/vault-cluster-public) and want a public domain name (e.g. `vault.example.com`), add that 
+       example](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/examples/vault-cluster-public) and want a public domain name (e.g. `vault.example.com`), add that 
        domain name here too.
     1. Set the `ip_addresses` to `127.0.0.1`. 
     1. For production usage, you should take care to protect the private key by encrypting it (see [Using TLS 
-       certs](https://github.com/gruntwork-io/terraform-consul-azure/modules/private-tls-cert#using-tls-certs) for more info). 
+       certs](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/private-tls-cert#using-tls-certs) for more info). 
 
 1. Update the `variables` section of the `vault-consul.json` Packer template to specify the Azure region, Vault 
    version, Consul version, and the paths to the TLS cert files you just generated. 
@@ -57,7 +57,7 @@ provisioner. Instead of:
   },{
     "type": "shell",
     "inline": [
-      "/tmp/terraform-vault-azure/modules/install-vault/install-vault --version {{user `vault_version`}}"
+      "/tmp/terraform-vault-azure/tree/master/modules/install-vault/install-vault --version {{user `vault_version`}}"
     ],
     "pause_before": "30s"
   }]
@@ -72,7 +72,7 @@ Your code should look more like this:
     "type": "shell",
     "inline": [
       "git clone --branch <MODULE_VERSION> https://github.com/gruntwork-io/terraform-vault-azure.git /tmp/terraform-vault-azure",
-      "/tmp/terraform-vault-azure/modules/install-vault/install-vault --version {{user `vault_version`}}"
+      "/tmp/terraform-vault-azure/tree/master/modules/install-vault/install-vault --version {{user `vault_version`}}"
     ],
     "pause_before": "30s"
   }]
