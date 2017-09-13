@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # DEPLOY A CONSUL CLUSTER IN AZURE
-# These templates show an example of how to use the consul-cluster module to deploy Consul in Azure. We deploy two
+# These configurations show an example of how to use the consul-cluster module to deploy Consul in Azure. We deploy two
 # Scale Sets: one with Consul server nodes and one with Consul client nodes. Note that these templates assume
 # that the Custom Image you provide via the image_id input variable is built from the
 # examples/consul-image/consul.json Packer template.
