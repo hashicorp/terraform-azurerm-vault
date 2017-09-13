@@ -1,6 +1,6 @@
 # Vault and Consul AMI
 
-This folder shows an example of how to use the [install-vault sub0module](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/install-vault) from this Module and 
+This folder shows an example of how to use the [install-vault sub-module](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/install-vault) from this Module and 
 the [install-consul](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-consul)
 and [install-dnsmasq](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-dnsmasq) modules
 from the Consul Azure Module with [Packer](https://www.packer.io/) to create an 
