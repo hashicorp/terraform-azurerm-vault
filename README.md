@@ -10,7 +10,7 @@ server cluster as a [high availability backend](https://www.vaultproject.io/docs
 
 This Module includes:
 
-* [install-vault](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/install-valut): This module can be used to install Vault. It can be used in a 
+* [install-vault](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/install-vault): This module can be used to install Vault. It can be used in a 
   [Packer](https://www.packer.io/) template to create a Vault 
   [Azure Manager Image](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/build-image-with-packer).
 
