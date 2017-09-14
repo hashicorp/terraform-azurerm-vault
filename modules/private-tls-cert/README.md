@@ -2,7 +2,7 @@
 
 This module can be used to generate a Certificate Authority (CA) public key and the public and private keys of a 
 TLS certificate signed by this CA. This certificate is meant to be used with **private** services, such as a Vault 
-cluster accessed solely within your AWS account. For publicly-accessible services, especially services you access 
+cluster accessed solely within your Azure account. For publicly-accessible services, especially services you access 
 through a web browser, you should NOT use this module, and instead get certificates from a commercial Certificate 
 Authority, such as [Let's Encrypt](https://letsencrypt.org/).
 

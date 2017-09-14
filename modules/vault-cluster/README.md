@@ -138,7 +138,7 @@ secrets.
 There are three ways to connect to Vault:
 
 1. [Access Vault from a Vault server](#access-vault-from-a-vault-server)
-1. [Access Vault from other servers in the same AWS account](#access-vault-from-other-servers-in-the-same-aws-account)
+1. [Access Vault from other servers in the same Azure account](#access-vault-from-other-servers-in-the-same-aws-account)
 1. [Access Vault from the public Internet](#access-vault-from-the-public-internet)
 
 
@@ -157,7 +157,7 @@ value               bar
 ```
 
 
-#### Access Vault from other servers in the same AWS account
+#### Access Vault from other servers in the same Azure account
 
 To access Vault from a different server in the same account, you need to specify the URL of the Vault cluster. You 
 could manually look up the Vault cluster's IP address, but since this module uses Consul not only as a [storage 
@@ -167,7 +167,7 @@ using a nice domain name instead, such as `vault.service.consul`.
 
 To set this up, use the [install-dnsmasq 
 module](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-dnsmasq) on each server that 
-needs to access Vault. This allows you to access Vault from your EC2 Instances as follows:
+needs to access Vault. This allows you to access Vault from your Azure Instances as follows:
 
 ```
 vault -address=https://vault.service.consul:8200 read secret/foo
@@ -325,7 +325,7 @@ Vault servers keep everything in memory and does not write any data to the local
 encrypts it, and sends it off to its storage backends, so no matter how the backend stores that data, it is already
 encrypted. By default, this Blueprint uses Consul as a storage backend, so if you want an additional layer of 
 protection, you can check out the [official Consul encryption docs](https://www.consul.io/docs/agent/encryption.html) 
-and the Consul AWS Blueprint [How do you handle encryption 
+and the Consul Azure Module [How do you handle encryption 
 docs](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/run-consul#how-do-you-handle-encryption)
 for more info.
 

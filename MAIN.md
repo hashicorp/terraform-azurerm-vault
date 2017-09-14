@@ -9,6 +9,9 @@ from the Consul Azure Module.
 This example creates a public Vault cluster that is accessible from the public Internet via an
 [Azure Load Balancer](https://docs.microsoft.com/en-us/azure/load-balancer/load-balancer-overview). 
 
+WARNING: For production use, you should deploy the cluster without a load balancer so that it is only accessible from within
+your Azure account.
+
 ![Vault architecture](https://github.com/gruntwork-io/terraform-vault-azure/master/_docs/architecture-azurelb.png)
 
 You will need to create an [Azure Managed Image](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/build-image-with-packer) 
