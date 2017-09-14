@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------------------------------------------------
-# DEPLOY A CONSUL CLUSTER IN AZURE
+# DEPLOY A VAULT CLUSTER IN AZURE
 # These configurations show an example of how to use the consul-cluster module to deploy Consul in Azure. We deploy two
 # Scale Sets: one with Consul server nodes and one with Consul client nodes. Note that these templates assume
 # that the Custom Image you provide via the image_id input variable is built from the
@@ -39,10 +39,7 @@ resource "azurerm_subnet" "consul" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 module "consul_servers" {
-  # When using these modules in your own templates, you will need to use a Git URL with a ref attribute that pins you
-  # to a specific version of the modules, such as the following example:
-  # source = "git::git@github.com:gruntwork-io/terraform-consul-azure.git//modules/consul-cluster?ref=v0.0.1"
-  source = "../terraform-consul-azure/tree/master/modules/consul-cluster"
+  source = "git::git@github.com:hashicorp/terraform-azurerm-consul.git//modules/consul-cluster?ref=v0.0.1"
 
   cluster_name = "${var.consul_cluster_name}"
   cluster_size = "${var.num_consul_servers}"
@@ -93,7 +90,7 @@ resource "azurerm_storage_container" "vault_storage" {
 module "vault_servers" {
   # When using these modules in your own templates, you will need to use a Git URL with a ref attribute that pins you
   # to a specific version of the modules, such as the following example:
-  # source = "git::git@github.com:gruntwork-io/terraform-vault-azure.git//modules/vault-cluster?ref=v0.0.1"
+  # source = "git::git@github.com:hashicorp/terraform-azurerm-vault.git//modules/vault-cluster?ref=v0.0.1"
   source = "./modules/vault-cluster"
 
   cluster_name = "${var.vault_cluster_name}"

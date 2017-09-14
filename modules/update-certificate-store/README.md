@@ -6,7 +6,7 @@ x509 certificate errors. This script has been tested on the following operating 
 chance it will work on other flavors of Debian as well.
 
 If you're unfamiliar with how TLS certificates work, check out the [Background 
-section](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/private-tls-cert#background).
+section](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/modules/private-tls-cert#background).
 
 ## Motivation
 
@@ -43,7 +43,7 @@ To use the `update-certificate-script`, use `git` to clone this repository at a 
 [releases page](../../../../releases) for all available tags) and run the `update-certificate-script` script:
 
 ```
-git clone --branch <VERSION> https://github.com/gruntwork-io/terraform-vault-azure.git
+git clone --branch <VERSION> https://github.com/hashicorp/terraform-azurerm-vault.git
 terraform-vault-azure/tree/master/modules/update-certificate-script/update-certificate-script --cert-file-path /opt/vault/tls/ca.cert.pem
 ```
 
@@ -60,7 +60,7 @@ refresh_interval    768h0m0s
 value               bar
 ```
 
-See the [vault-consul-image example](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/examples/vault-consul-image) for working sample code.
+See the [vault-consul-image example](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/examples/vault-consul-image) for working sample code.
 
 
 
