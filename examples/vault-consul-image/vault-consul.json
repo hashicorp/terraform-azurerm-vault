@@ -39,12 +39,6 @@
       "destination": "/tmp"
     },
     {
-      "type": "shell",
-      "inline": [
-        "sudo apt-get install -y git"
-      ]
-    },
-    {
       "type": "file",
       "source": "{{user `ca_public_key_path`}}",
       "destination": "/tmp/ca.crt.pem"
@@ -67,12 +61,12 @@
         "DEBIAN_FRONTEND=noninteractive apt-get -y upgrade",
         "echo \"deb https://packages.microsoft.com/repos/azure-cli/ wheezy main\" | sudo tee /etc/apt/sources.list.d/azure-cli.list",
         "apt-key adv --keyserver packages.microsoft.com --recv-keys 417A0893",
-        "apt-get update && apt-get install -y libssl-dev libffi-dev python-dev build-essential apt-transport-https azure-cli",
+        "apt-get update && apt-get install -y git libssl-dev libffi-dev python-dev build-essential apt-transport-https azure-cli",
 
-        "/tmp/terraform-vault-azure/tree/master/modules/install-vault/install-vault --version {{user `vault_version`}}",
+        "/tmp/terraform-vault-azure/modules/install-vault/install-vault --version {{user `vault_version`}}",
         "git clone --branch {{user `consul_module_version`}} https://{{user `github_oauth_token`}}@github.com/gruntwork-io/terraform-consul-azure.git /tmp/terraform-consul-azure",
-        "/tmp/terraform-consul-azure/tree/master/modules/install-consul/install-consul --version {{user `consul_version`}}",
-        "/tmp/terraform-consul-azure/tree/master/modules/install-dnsmasq/install-dnsmasq"
+        "/tmp/terraform-consul-azure/modules/install-consul/install-consul --version {{user `consul_version`}}",
+        "/tmp/terraform-consul-azure/modules/install-dnsmasq/install-dnsmasq"
       ]
     },
     {
@@ -85,7 +79,7 @@
         "mv /tmp/vault.key.pem /opt/vault/tls/",
         "chown vault:vault /opt/vault/tls/*",
         "chmod 600 /opt/vault/tls/*",
-        "/tmp/terraform-vault-azure/tree/master/modules/update-certificate-store/update-certificate-store --cert-file-path /opt/vault/tls/ca.crt.pem"
+        "/tmp/terraform-vault-azure/modules/update-certificate-store/update-certificate-store --cert-file-path /opt/vault/tls/ca.crt.pem"
       ]
     },
     {
