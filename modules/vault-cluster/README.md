@@ -138,7 +138,7 @@ secrets.
 There are three ways to connect to Vault:
 
 1. [Access Vault from a Vault server](#access-vault-from-a-vault-server)
-1. [Access Vault from other servers in the same Azure account](#access-vault-from-other-servers-in-the-same-aws-account)
+1. [Access Vault from other servers in the same Azure account](#access-vault-from-other-servers-in-the-same-azure-account)
 1. [Access Vault from the public Internet](#access-vault-from-the-public-internet)
 
 
