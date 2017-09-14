@@ -1,7 +1,7 @@
 # Vault Examples Helper
 
 This folder contains a helper script called `vault-examples-helper.sh` for working with the 
-[main example](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/MAIN.md) After running `terraform apply`, if you 
+[main example](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/MAIN.md) After running `terraform apply`, if you 
 run  `vault-examples-helper.sh`, it will automatically:
 
 1. Wait for the Vault server cluster to come up.

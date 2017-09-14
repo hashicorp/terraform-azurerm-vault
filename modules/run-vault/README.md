@@ -6,7 +6,7 @@ script has been tested on Ubuntu 16.04. There is a good chance it will work on o
 ## Quick start
 
 This script assumes you installed it, plus all of its dependencies (including Vault itself), using the [install-vault 
-module](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/install-vault). The default install path is 
+module](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/modules/install-vault). The default install path is 
 `/opt/vault/bin`, so to start Vault in server mode, you run:
 
 ```
@@ -30,7 +30,7 @@ Data](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/classic/in
 when the Azure Instance is first booting. After running `run-vault` on that initial boot, the `supervisord` configuration 
 will automatically restart Vault if it crashes or the Azure instance reboots.
 
-See the [main example](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/MAIN.md) for fully-working sample code.
+See the [main example](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/MAIN.md) for fully-working sample code.
 
 
 ## Command line Arguments
@@ -153,7 +153,7 @@ certificate:
 /opt/vault/bin/run-vault --azure-account-name my-account-name --azure-account-key [REDACTED] --azure-container my-container-name --tls-cert-file /opt/vault/tls/vault.crt.pem --tls-key-file /opt/vault/tls/vault.key.pem
 ```
 
-See the [private-tls-cert module](https://github.com/gruntwork-io/terraform-vault-azure/tree/master/modules/private-tls-cert) for information on how to generate a TLS certificate.
+See the [private-tls-cert module](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/modules/private-tls-cert) for information on how to generate a TLS certificate.
 
 
 ### Consul encryption
@@ -165,5 +165,5 @@ necessary, but may be a good extra layer of security.
 By default, the Vault server nodes communicate with a local Consul agent running on the same server over (unencrypted) 
 HTTP. However, you can configure those agents to talk to the Consul servers using TLS. Check out the [official Consul 
 encryption docs](https://www.consul.io/docs/agent/encryption.html) and the Consul Azure Module [How do you handle 
-encryption docs](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/run-consul#how-do-you-handle-encryption)
+encryption docs](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/run-consul#how-do-you-handle-encryption)
 for more info.
