@@ -63,7 +63,7 @@ Check out the [main example](https://github.com/hashicorp/terraform-azurerm-vaul
 ## How do you use the Vault cluster?
 
 To use the Vault cluster, you will typically need to SSH to each of the Vault servers. If you deployed the
-[main example](/MAIN.md) example, the [vault-examples-helper.sh script](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/examples/vault-examples-helper/vault-examples-helper.sh) 
+[main example](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/MAIN.md) example, the [vault-examples-helper.sh script](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/examples/vault-examples-helper/vault-examples-helper.sh) 
 will do the lookup for you automatically (note, you must have the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) 
 and [jq](https://stedolan.github.io/jq/) installed locally):
 

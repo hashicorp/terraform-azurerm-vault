@@ -12,7 +12,7 @@ module](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/module
 same Image to deploy a separate [Consul server cluster](https://www.consul.io/) by using the [consul-cluster 
 module](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/consul-cluster). 
 
-Check out the [main example](/MAIN.md) for working sample code. For more info on Vault 
+Check out the [main example](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/MAIN.md) for working sample code. For more info on Vault 
 installation and configuration, check out the [install-vault](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/modules/install-vault) documentation.
 
 ## Quick start
@@ -39,7 +39,7 @@ To build the Vault and Consul Azure Image:
 
 1. Run `packer build vault-consul.json`.
 
-To see how to deploy this image, check out the [main example](/MAIN.md).
+To see how to deploy this image, check out the [main example](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/MAIN.md).
 
 
 ## Creating your own Packer template for production usage

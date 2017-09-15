@@ -62,10 +62,10 @@ Gruntwork can help with:
 
 Each Module has the following folder structure:
 
-* [root](/): The root folder contains an example of running a public Vault cluster on Azure
-* [modules](/modules): This folder contains the reusable code for this Module, broken down into one or more modules.
-* [examples](/examples): This folder contains examples of how to use the modules.
-* [test](/test): Automated tests for the modules and examples.
+* [root](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/): The root folder contains an example of running a public Vault cluster on Azure
+* [modules](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/modules): This folder contains the reusable code for this Module, broken down into one or more modules.
+* [examples](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/examples): This folder contains examples of how to use the modules.
+* [test](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/test): Automated tests for the modules and examples.
 
 Click on each of the modules above for more details.
 
@@ -102,7 +102,7 @@ To deploy the Vault cluster:
  
 ## How do I contribute to this Module?
 
-Contributions are very welcome! Check out the [Contribution Guidelines](/CONTRIBUTING.md) for instructions.
+Contributions are very welcome! Check out the [Contribution Guidelines](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/CONTRIBUTING.md) for instructions.
 
 
 
@@ -119,6 +119,6 @@ MINOR, and PATCH versions on each release to indicate any incompatibilities.
 
 ## License
 
-This code is released under the Apache 2.0 License. Please see [LICENSE](/LICENSE) and [NOTICE](/NOTICE) for more 
+This code is released under the Apache 2.0 License. Please see [LICENSE](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/LICENSE) and [NOTICE](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/NOTICE) for more 
 details.
 
