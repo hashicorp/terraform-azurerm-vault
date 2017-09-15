@@ -6,7 +6,7 @@ managing secrets. This Module uses [Azure Storage](https://docs.microsoft.com/en
 backend](https://www.vaultproject.io/docs/configuration/storage/index.html) and a [Consul](https://www.consul.io) 
 server cluster as a [high availability backend](https://www.vaultproject.io/docs/concepts/ha.html):
 
-![Vault architecture](/_docs/architecture.png)
+![Vault architecture](https://raw.githubusercontent.com/hashicorp/terraform-azurerm-vault/master/_docs/architecture.png)
 
 This Module includes:
 

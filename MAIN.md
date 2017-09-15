@@ -12,7 +12,7 @@ This example creates a public Vault cluster that is accessible from the public I
 WARNING: For production use, you should deploy the cluster without a load balancer so that it is only accessible from within
 your Azure account.
 
-![Vault architecture](https://github.com/hashicorp/terraform-azurerm-vault/master/_docs/architecture-azurelb.png)
+![Vault architecture](https://raw.githubusercontent.com/hashicorp/terraform-azurerm-vault/master/_docs/architecture-azurelb.png)
 
 You will need to create an [Azure Managed Image](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/build-image-with-packer) 
 that has Vault and Consul installed, which you can do using the [vault-consul-image example](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/examples/vault-consul-image).  

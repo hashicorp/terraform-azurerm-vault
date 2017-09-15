@@ -243,7 +243,7 @@ vault read secret/foo
 
 This module creates the following architecture:
 
-![Vault architecture](https://github.com/hashicorp/terraform-azurerm-vault/_docs/architecture.png)
+![Vault architecture](https://raw.githubusercontent.com/hashicorp/terraform-azurerm-vault/master/_docs/architecture.png)
 
 
 ## How do you roll out updates?
