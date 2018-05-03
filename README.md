@@ -80,7 +80,7 @@ To deploy the Vault cluster:
 1. Create an Azure Image that has Vault installed (using the [install-vault module](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/modules/install-vault)) and the Consul
    agent installed (using the [install-consul 
    module](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/install-consul)). Here is an 
-   [example Packer template](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/examples/vault-consul-image). 
+   [example Packer template](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/examples/consul-image). 
    
 1. Deploy that Azure Image across a Scale Set in a private subnet using the Terraform [vault-cluster 
    module](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/modules/vault-cluster). 
