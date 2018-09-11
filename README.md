@@ -12,7 +12,7 @@ This Module includes:
 
 * [install-vault](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/modules/install-vault): This module can be used to install Vault. It can be used in a 
   [Packer](https://www.packer.io/) template to create a Vault 
-  [Azure Manager Image](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/build-image-with-packer).
+  [Azure Managed Image](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/build-image-with-packer).
 
 * [run-vault](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/modules/run-vault): This module can be used to configure and run Vault. It can be used in a 
   [Custom Data](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/classic/inject-custom-data) 
