@@ -52,12 +52,12 @@ provisioner. Instead of:
 {
   "provisioners": [{
     "type": "file",
-    "source": "{{template_dir}}/../../../terraform-vault-azure",
+    "source": "{{template_dir}}/../../../terraform-azurerm-vault",
     "destination": "/tmp"
   },{
     "type": "shell",
     "inline": [
-      "/tmp/terraform-vault-azure/tree/master/modules/install-vault/install-vault --version {{user `vault_version`}}"
+      "/tmp/terraform-azurerm-vault/tree/master/modules/install-vault/install-vault --version {{user `vault_version`}}"
     ],
     "pause_before": "30s"
   }]
@@ -71,8 +71,8 @@ Your code should look more like this:
   "provisioners": [{
     "type": "shell",
     "inline": [
-      "git clone --branch <MODULE_VERSION> https://github.com/hashicorp/terraform-azurerm-vault.git /tmp/terraform-vault-azure",
-      "/tmp/terraform-vault-azure/tree/master/modules/install-vault/install-vault --version {{user `vault_version`}}"
+      "git clone --branch <MODULE_VERSION> https://github.com/hashicorp/terraform-azurerm-vault.git /tmp/terraform-azurerm-vault",
+      "/tmp/terraform-azurerm-vault/tree/master/modules/install-vault/install-vault --version {{user `vault_version`}}"
     ],
     "pause_before": "30s"
   }]
