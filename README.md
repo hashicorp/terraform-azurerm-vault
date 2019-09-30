@@ -1,3 +1,4 @@
+[![Maintained by Gruntwork.io](https://img.shields.io/badge/maintained%20by-gruntwork.io-%235849a6.svg)](https://gruntwork.io/?ref=repo_azure_vault)
 # Vault Azure Module
 
 This repo contains a Module to deploy a [Vault](https://www.vaultproject.io/) cluster on 
