@@ -15,5 +15,5 @@ output "storage_containter_id" {
 }
 
 output "load_balancer_ip_address" {
-  value = "${azurerm_public_ip.vault_access.ip_address}"
+  value = "${azurerm_public_ip.vault_access.*.ip_address}"
 }
