@@ -72,6 +72,9 @@ function get_instance_ip_address {
   lookup_path_in_instance_metadata ".network.interface[0].ipv4.ipAddress[0].privateIpAddress"
 }
 
+function get_cluster_name {
+  lookup_path_in_instance_metadata ".compute.name" | sed 's/_[^_]*//'
+}
 
 # Based on code from: http://stackoverflow.com/a/16623897/483528
 function strip_prefix {
@@ -111,6 +114,7 @@ function generate_vault_config {
   local readonly azure_account_key="$8"
   local readonly azure_container="$9"
   local readonly config_path="$config_dir/$VAULT_CONFIG_FILE"
+  local readonly cluster_name="$(get_cluster_name)"
 
   local instance_ip_address
   instance_ip_address=$(get_instance_ip_address)
@@ -140,6 +144,8 @@ listener "tcp" {
   tls_cert_file   = "$tls_cert_file"
   tls_key_file    = "$tls_key_file"
 }
+
+cluster_name = "$cluster_name"
 EOF
   chown "$user:$user" "$config_path"
 }
