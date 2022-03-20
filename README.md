@@ -1,4 +1,11 @@
-[![Maintained by Gruntwork.io](https://img.shields.io/badge/maintained%20by-gruntwork.io-%235849a6.svg)](https://gruntwork.io/?ref=repo_azure_vault)
+# DISCLAIMER
+**This repository is no longer supported, please consider using [this repository](https://registry.terraform.io/modules/hashicorp/vault-starter/azure/latest) for the latest and most supported version for Vault.**
+
+Moving forward in the future this repository will be no longer supported and eventually lead to
+deprecation. Please use our latest versions of our products moving forward or alternatively you
+may fork the repository to continue use and development for your personal/business use.
+
+---
 # Vault Azure Module
 
 This repo contains a Module to deploy a [Vault](https://www.vaultproject.io/) cluster on 
@@ -48,7 +55,7 @@ a version number bump.
  
 ## Who maintains this Module?
 
-This Module is maintained by [Gruntwork](http://www.gruntwork.io/). If you're looking for help or commercial 
+This Module is maintained by [Gruntwork](http://www.gruntwork.io/?ref=repo_azure_vault). If you're looking for help or commercial 
 support, send an email to [modules@gruntwork.io](mailto:modules@gruntwork.io?Subject=Vault%20Module). 
 Gruntwork can help with:
 
