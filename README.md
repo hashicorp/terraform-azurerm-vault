@@ -53,16 +53,9 @@ a version number bump.
  
  
  
-## Who maintains this Module?
+## Who created this Module?
 
-This Module is maintained by [Gruntwork](http://www.gruntwork.io/?ref=repo_azure_vault). If you're looking for help or commercial 
-support, send an email to [modules@gruntwork.io](mailto:modules@gruntwork.io?Subject=Vault%20Module). 
-Gruntwork can help with:
-
-* Setup, customization, and support for this Module.
-* Module for other types of infrastructure, such as VPCs, Docker clusters, databases, and continuous integration.
-* Module that meet compliance requirements, such as HIPAA.
-* Consulting & Training on AWS, Terraform, and DevOps.
+These modules were created by [Gruntwork](http://www.gruntwork.io/?ref=repo_azure_vault), in partnership with HashiCorp, in 2017 and maintained through 2021. They were deprecated in 2022 in favor of newer alternatives (see the top of the README for details).
 
 
 
@@ -108,12 +101,6 @@ To deploy the Vault cluster:
    to learn how to initialize, unseal, and use Vault.
 
  
-## How do I contribute to this Module?
-
-Contributions are very welcome! Check out the [Contribution Guidelines](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/CONTRIBUTING.md) for instructions.
-
-
-
 ## How is this Module versioned?
 
 This Module follows the principles of [Semantic Versioning](http://semver.org/). You can find each new release, 
