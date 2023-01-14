@@ -116,6 +116,7 @@ function create_vault_install_paths {
   sudo mkdir -p "$path/data"
   sudo mkdir -p "$path/log"
   sudo mkdir -p "$path/tls"
+  sudo ln -nsf "$path/log" /var/log/vault
 
   log_info "Changing ownership of $path to $username"
   sudo chown -R "$username:$username" "$path"
