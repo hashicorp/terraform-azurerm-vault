@@ -92,9 +92,9 @@ available.
       connection is to a Consul agent running on the same server.
     * [path](https://www.vaultproject.io/docs/configuration/storage/consul.html#path): Set to `vault/`.
     * [service](https://www.vaultproject.io/docs/configuration/storage/consul.html#service): Set to `vault`.  
-    * [redirect_addr](https://www.vaultproject.io/docs/configuration/storage/consul.html#redirect_addr): 
-      Set to `https://<PRIVATE_IP>:<CLUSTER_PORT>` where `PRIVATE_IP` is the Instance's private IP and `CLUSTER_PORT` is
-      the value passed to `--cluster-port`.  
+	* [api_addr](https://www.vaultproject.io/docs/configuration/index.html#api_addr):
+	  Set to `https://<PRIVATE_IP>:<PORT>` where `PRIVATE_IP` is the Instance's private IP and `PORT` is
+	  the value passed to `--port`.
     * [cluster_addr](https://www.vaultproject.io/docs/configuration/storage/consul.html#cluster_addr): 
       Set to `https://<PRIVATE_IP>:<CLUSTER_PORT>` where `PRIVATE_IP` is the Instance's private IP and `CLUSTER_PORT` is
       the value passed to `--cluster-port`.
