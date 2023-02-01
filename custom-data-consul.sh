@@ -1,4 +1,7 @@
 #!/bin/bash
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
 # This script is meant to be run in the Custom Data of each Azure Instance while it's booting. The script uses the
 # run-consul script to configure and start Consul in server mode. Note that this script assumes it's running in an Azure Image
 # built from the Packer template in examples/consul-ami/consul.json.

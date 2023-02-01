@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
 # ---------------------------------------------------------------------------------------------------------------------
 # DEPLOY A VAULT CLUSTER IN AZURE
 # These configurations show an example of how to use the consul-cluster module to deploy Consul in Azure. We deploy two
