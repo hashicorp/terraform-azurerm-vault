@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
 output "vault_cluster_size" {
   value = "${var.num_vault_servers}"
 }

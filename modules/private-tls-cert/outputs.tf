@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
 output "ca_public_key_file_path" {
   value = "${var.ca_public_key_file_path}"
 }

@@ -1,4 +1,7 @@
 #!/bin/bash
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
 # A script that is meant to be used with the private Valut cluster examples to:
 #
 # 1. Wait for the Vault server cluster to come up.
