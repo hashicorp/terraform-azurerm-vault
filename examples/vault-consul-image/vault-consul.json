@@ -60,7 +60,7 @@
       "inline": [
         "DEBIAN_FRONTEND=noninteractive apt-get -y upgrade",
         "echo \"deb https://packages.microsoft.com/repos/azure-cli/ wheezy main\" | sudo tee /etc/apt/sources.list.d/azure-cli.list",
-        "apt-key adv --keyserver packages.microsoft.com --recv-keys 417A0893",
+        "curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -",
         "apt-get update && apt-get install -y git libssl-dev libffi-dev python-dev build-essential apt-transport-https azure-cli",
 
         "/tmp/terraform-vault-azure/modules/install-vault/install-vault --version {{user `vault_version`}}",
