@@ -49,6 +49,7 @@ resource "azurerm_lb_nat_pool" "vault_lbnatpool" {
 }
 
 resource "azurerm_lb_probe" "vault_probe" {
+  count = "${var.associate_public_ip_address_load_balancer ? 1 : 0}"
   resource_group_name = "${var.resource_group_name}"
   loadbalancer_id = "${azurerm_lb.vault_access.id}"
   name                = "vault-running-probe"
