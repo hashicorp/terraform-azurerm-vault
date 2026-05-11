@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 output "ca_public_key_file_path" {
   value = "${var.ca_public_key_file_path}"
 }

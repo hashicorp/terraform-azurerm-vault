@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 # ---------------------------------------------------------------------------------------------------------------------
 # DEPLOY A VAULT CLUSTER IN AZURE
 # These configurations show an example of how to use the consul-cluster module to deploy Consul in Azure. We deploy two

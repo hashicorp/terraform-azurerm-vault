@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright IBM Corp. 2017, 2026
+
 #
 # supervisord   Startup script for the Supervisor process control system
 #

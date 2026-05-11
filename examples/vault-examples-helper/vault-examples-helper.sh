@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright IBM Corp. 2017, 2026
+
 # A script that is meant to be used with the private Valut cluster examples to:
 #
 # 1. Wait for the Vault server cluster to come up.

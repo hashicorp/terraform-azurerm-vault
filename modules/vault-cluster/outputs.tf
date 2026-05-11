@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 output "scale_set_name" {
   value = "${var.cluster_name}"
 }
